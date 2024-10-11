@@ -1,6 +1,7 @@
 package NeoBivago.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class UserController {
 
     // CRUD:
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<String> createUser(@RequestBody @Valid RegisterDTO data) {
                 
         UserModel newUser = new UserModel(data.name(), data.email(), data.password(), data.cpf(), data.birthday() );
@@ -49,7 +50,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/read")
+    @GetMapping
     public ResponseEntity<List<UserModel>> readAllUsers() {
 
         List<UserModel> userList = this.ur.findAll();
@@ -58,7 +59,16 @@ public class UserController {
 
     }
 
-    @PutMapping("/update/{id}")
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<UserModel>> findUserById(@PathVariable UUID id) {
+
+        Optional<UserModel> user = this.ur.findById(id);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateUser(@RequestBody UserModel user, @PathVariable UUID id) {
 
         try {
@@ -70,7 +80,7 @@ public class UserController {
 
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
 
         try {

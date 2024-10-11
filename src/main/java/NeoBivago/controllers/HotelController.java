@@ -1,6 +1,7 @@
 package NeoBivago.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class HotelController {
 
     // CRUD:
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<String> createHotel(@RequestBody @Valid HotelDTO data) {
 
         HotelModel newHotel = new HotelModel(data.owner(), data.name(), data.address(), data.city(), data.score());
@@ -49,7 +50,7 @@ public class HotelController {
 
     }
 
-    @GetMapping("/read")
+    @GetMapping
     public ResponseEntity<List<HotelModel>> readAllHotels() {
 
         List<HotelModel> hotelList = this.hr.findAll();
@@ -58,7 +59,16 @@ public class HotelController {
 
     }
 
-    @PutMapping("/update/{id}")
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<HotelModel>> findHotelById(@PathVariable UUID id) {
+
+        Optional<HotelModel> hotel = this.hr.findById(id);
+
+        return new ResponseEntity<>(hotel, HttpStatus.OK);
+
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateHotel(@RequestBody HotelModel hotel, @PathVariable UUID id) {
 
         try {
@@ -70,7 +80,7 @@ public class HotelController {
 
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHotel(@PathVariable UUID id) {
 
         try {

@@ -46,7 +46,7 @@ public class TokenService {
             
             Algorithm algorithm = Algorithm.HMAC256(secretKey);
             return JWT.require(algorithm)
-                .withIssuer("caninus-api")
+                .withIssuer("neobivago-api")
                 .build()
                 .verify(token)
                 .getSubject();

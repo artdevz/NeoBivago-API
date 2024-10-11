@@ -44,9 +44,7 @@ public class RoomModel implements Serializable {
     private int roomPrice; // Cents
 
     @Column(name = "type")
-    private ERoomType roomType;
-
-    
+    private ERoomType roomType;    
 
     // Constructors:
     public RoomModel(UUID hotelId, int roomNumber, int roomCapacity, int roomPrice, ERoomType roomType) {

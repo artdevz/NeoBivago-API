@@ -1,6 +1,7 @@
 package NeoBivago.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import NeoBivago.dto.room.RoomDTO;
+import NeoBivago.dto.room.RoomFilterDTO;
 import NeoBivago.models.RoomModel;
 import NeoBivago.repositories.RoomRepository;
 import NeoBivago.services.RoomService;
@@ -35,7 +37,7 @@ public class RoomController {
 
     // CRUD:
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<String> createRoom(@RequestBody @Valid RoomDTO data) {
 
         RoomModel newRoom = new RoomModel(data.hotel(), data.number(), data.capacity(), data.price(), data.type());
@@ -49,7 +51,7 @@ public class RoomController {
 
     }
 
-    @GetMapping("/read")
+    @GetMapping
     public ResponseEntity<List<RoomModel>> readAllRooms() {
 
         List<RoomModel> roomList = this.rr.findAll();
@@ -58,7 +60,25 @@ public class RoomController {
 
     }
 
-    @PutMapping("/update/{id}")
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<RoomModel>> findRoomById(@PathVariable UUID id) {
+
+        Optional<RoomModel> room = this.rr.findById(id);
+
+        return new ResponseEntity<>(room, HttpStatus.OK);
+
+    }
+    
+    @GetMapping("/filter")
+    public ResponseEntity<List<RoomModel>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
+
+        List<RoomModel> roomList = this.rr.roomFilter(data.hotel(), data.capacity(), data.price(), data.type());
+
+        return new ResponseEntity<>(roomList, HttpStatus.OK);
+
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateRoom(@RequestBody RoomModel room, @PathVariable UUID id) {
 
         try {
@@ -70,7 +90,7 @@ public class RoomController {
 
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRoom(@PathVariable UUID id) {
 
         try {

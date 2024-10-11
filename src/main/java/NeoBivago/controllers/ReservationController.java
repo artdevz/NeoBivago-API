@@ -1,6 +1,7 @@
 package NeoBivago.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class ReservationController {
 
     // CRUD:
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<String> createRoom(@RequestBody @Valid ReservationDTO data) {
 
         ReservationModel newReservation = new ReservationModel(data.user(), data.hotel(), data.room(), data.checkIn(), data.checkOut(), data.nop(), data.price());
@@ -49,7 +50,7 @@ public class ReservationController {
 
     }
 
-    @GetMapping("/read")
+    @GetMapping
     public ResponseEntity<List<ReservationModel>> readAllReservations() {
 
         List<ReservationModel> reservationList = this.rr.findAll();
@@ -58,7 +59,16 @@ public class ReservationController {
 
     }
 
-    @PutMapping("/update/{id}")
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<ReservationModel>> findReservationById(@PathVariable UUID id) {
+
+        Optional<ReservationModel> reservation = this.rr.findById(id);
+
+        return new ResponseEntity<>(reservation, HttpStatus.OK);
+
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateReservation(@RequestBody ReservationModel reservation, @PathVariable UUID id) {
 
         try {
@@ -70,7 +80,7 @@ public class ReservationController {
 
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable UUID id) {
 
         try {
