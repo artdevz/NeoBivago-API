@@ -28,7 +28,7 @@ public class TokenService {
 
             String token = JWT.create()
                 .withIssuer("neobivago-api")
-                .withSubject(user.getUserEmail())
+                .withSubject(user.getEmail())
                 .withExpiresAt(getExpirationDate())
                 .sign(algorithm);
 

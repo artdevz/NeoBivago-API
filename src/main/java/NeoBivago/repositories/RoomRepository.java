@@ -13,7 +13,7 @@ import NeoBivago.models.RoomModel;
 @Repository
 public interface RoomRepository extends JpaRepository<RoomModel, UUID> {
 
-    RoomModel findByRoomNumber(int number);
+    RoomModel findByNumber(int number);
 
     @Query(nativeQuery = true, value = "SELECT * FROM rooms WHERE " +
                                        "(:hotel IS NULL OR hotel = :hotel) AND " +

@@ -32,36 +32,36 @@ public class ReservationModel implements Serializable {
     private UUID reservationId;
 
     @Column(name = "user")
-    private UUID userId;
+    private UUID user;
 
     @Column(name = "hotel")
-    private UUID hotelid;
+    private UUID hotel;
 
     @Column(name = "room")
-    private UUID roomId;
+    private UUID room;
 
     @Column(name = "checkIn")
-    private Date reservationCheckIn;
+    private Date checkIn;
 
     @Column(name = "checkOut")
-    private Date reservationCheckOut;
+    private Date checkOut;
 
     @Column(name = "nop") // Number of People
-    private int reservationNOP;
+    private int nop;
 
     @Column(name = "price")
-    private int reservationPrice; // Cents
+    private int price; // Cents
 
     // Constructors:
-    public ReservationModel(UUID userId, UUID hotelid, UUID roomId, Date reservationCheckIn, Date reservationCheckOut, int reservationNOP, int reservationPrice) {
+    public ReservationModel(UUID user, UUID hotel, UUID room, Date checkIn, Date checkOut, int nop, int price) {
 
-        this.userId = userId;
-        this.hotelid = hotelid;
-        this.roomId = roomId;
-        this.reservationCheckIn = reservationCheckIn;
-        this.reservationCheckOut = reservationCheckOut;
-        this.reservationNOP = reservationNOP;
-        this.reservationPrice = reservationPrice;
+        this.user = user;
+        this.hotel = hotel;
+        this.room = room;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.nop = nop;
+        this.price = price;
         
     }
     

@@ -28,32 +28,32 @@ public class HotelModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private UUID hotelId;
+    private UUID id;
 
     @Column(name = "owner_id")
-    private UUID hotelOwnerId;
+    private UUID owner;
 
     @Column(name = "name")
-    private String hotelName;
+    private String name;
 
     @Column(name = "address")
-    private String hotelAddress;
+    private String address;
 
     @Column(name = "city")
-    private String hotelCity;
+    private String city;
 
     @Column(name = "score")
-    private float hotelScore;
+    private float score;
 
     // Constructors:
 
-    public HotelModel(UUID ownerId, String name, String address, String city, float score) {
+    public HotelModel(UUID owner, String name, String address, String city, float score) {
 
-        this.hotelOwnerId = ownerId;
-        this.hotelName = name;
-        this.hotelAddress = address;
-        this.hotelCity = city;
-        this.hotelScore = score;
+        this.owner = owner;
+        this.name = name;
+        this.address = address;
+        this.city = city;
+        this.score = score;
         
     }
 

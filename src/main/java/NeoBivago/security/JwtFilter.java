@@ -35,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authorizationHeader != null) {
             token = authorizationHeader.replace("Bearer ", "");
             var subject = this.ts.getSubject(token);
-            var user = this.ur.findByUserEmail(subject);
+            var user = this.ur.findByEmail(subject);
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 

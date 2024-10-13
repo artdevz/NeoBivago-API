@@ -23,20 +23,20 @@ public class UserService {
 
     public void create(UserModel user) throws Exception {
 
-        if (this.ur.findByUserEmail(user.getUserEmail()) != null) throw new AttributeRegisteredException("Email is already being used.");
-        if (this.ur.findByUserCPF(user.getUserCPF()) != null) throw new AttributeRegisteredException("CPF is already being used.");
+        if (this.ur.findByEmail(user.getEmail()) != null) throw new AttributeRegisteredException("Email is already being used.");
+        if (this.ur.findByCpf(user.getCpf()) != null) throw new AttributeRegisteredException("CPF is already being used.");
 
-        if ( (user.getUserName().length() < MINLENGHT) || (user.getUserName().length() > MAXLENGHT) ) throw new LenghtException("Username must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
+        if ( (user.getName().length() < MINLENGHT) || (user.getName().length() > MAXLENGHT) ) throw new LenghtException("Username must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
         if ( (user.getPassword().length() < PASSWORDMINLENGHT) || (user.getPassword().length() > MAXLENGHT) ) throw new LenghtException("Password must contain between " + PASSWORDMINLENGHT + " and " + MAXLENGHT + " characters.");
 
-        user.setUserPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         this.ur.save(user);
 
     }
 
     public void update(UUID id, UserModel user) {
 
-        user.setUserId(id);
+        user.setId(id);
         this.ur.save(user);        
 
     }

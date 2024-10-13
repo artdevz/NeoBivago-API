@@ -10,6 +10,6 @@ import NeoBivago.models.HotelModel;
 @Repository
 public interface HotelRepository extends JpaRepository<HotelModel, UUID> {
 
-    HotelModel findByHotelName(String hotelName);
+    HotelModel findByName(String hotelName);
 
 }

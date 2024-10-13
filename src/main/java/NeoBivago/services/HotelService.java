@@ -21,11 +21,11 @@ public class HotelService {
 
     public void create(HotelModel hotel) throws Exception {
         
-        if (this.hr.findByHotelName(hotel.getHotelName()) != null) throw new AttributeRegisteredException("Hotel is already being used.");
+        if (this.hr.findByName(hotel.getName()) != null) throw new AttributeRegisteredException("Hotel is already being used.");
 
-        if ( (hotel.getHotelName().length() < MINLENGHT) || (hotel.getHotelName().length() > MAXLENGHT) ) throw new LenghtException("HotelName must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
-        if ( (hotel.getHotelAddress().length() < MINLENGHT) || (hotel.getHotelAddress().length() > MAXLENGHT) ) throw new LenghtException("HotelAddress must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
-        if ( (hotel.getHotelCity().length() < MINLENGHT) || (hotel.getHotelCity().length() > MAXLENGHT) ) throw new LenghtException("HotelCity must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
+        if ( (hotel.getName().length() < MINLENGHT) || (hotel.getName().length() > MAXLENGHT) ) throw new LenghtException("HotelName must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
+        if ( (hotel.getAddress().length() < MINLENGHT) || (hotel.getAddress().length() > MAXLENGHT) ) throw new LenghtException("HotelAddress must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
+        if ( (hotel.getCity().length() < MINLENGHT) || (hotel.getCity().length() > MAXLENGHT) ) throw new LenghtException("HotelCity must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
 
         this.hr.save(hotel);
 
@@ -33,7 +33,7 @@ public class HotelService {
 
     public void update(UUID id, HotelModel hotel) {
         
-        hotel.setHotelId(id);
+        hotel.setId(id);
         this.hr.save(hotel);
 
     }

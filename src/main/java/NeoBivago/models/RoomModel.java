@@ -29,31 +29,31 @@ public class RoomModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private UUID roomId;
+    private UUID id;
 
     @Column(name = "hotel")
-    private UUID hotelId;
+    private UUID hotel;
 
     @Column(name = "number")
-    private int roomNumber;
+    private int number;
 
     @Column(name = "capacity")
-    private int roomCapacity;
+    private int capacity;
 
     @Column(name = "price")
-    private int roomPrice; // Cents
+    private int price; // Cents
 
     @Column(name = "type")
-    private ERoomType roomType;    
+    private ERoomType type;    
 
     // Constructors:
-    public RoomModel(UUID hotelId, int roomNumber, int roomCapacity, int roomPrice, ERoomType roomType) {
+    public RoomModel(UUID hotel, int number, int capacity, int price, ERoomType type) {
 
-        this.hotelId = hotelId;
-        this.roomNumber = roomNumber;
-        this.roomCapacity = roomCapacity;
-        this.roomPrice = roomPrice;
-        this.roomType = roomType;
+        this.hotel = hotel;
+        this.number = number;
+        this.capacity = capacity;
+        this.price = price;
+        this.type = type;
         
     }
 

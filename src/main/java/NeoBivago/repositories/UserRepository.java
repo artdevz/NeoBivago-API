@@ -11,7 +11,7 @@ import NeoBivago.models.UserModel;
 @Repository
 public interface UserRepository extends JpaRepository<UserModel, UUID> {
 
-    UserDetails findByUserEmail(String userEmail);
-    UserModel findByUserCPF(String userCPF);
+    UserDetails findByEmail(String email);
+    UserModel findByCpf(String cpf);
 
 } 

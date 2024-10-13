@@ -17,7 +17,7 @@ public class RoomService {
 
     public void create(RoomModel room) throws Exception {
 
-        if (this.rr.findByRoomNumber(room.getRoomNumber()) != null) throw new AttributeRegisteredException("RoomNumber is already being used.");
+        if (this.rr.findByNumber(room.getNumber()) != null) throw new AttributeRegisteredException("RoomNumber is already being used.");
 
         this.rr.save(room);
 
@@ -25,7 +25,7 @@ public class RoomService {
 
     public void update(UUID id, RoomModel room) {
         
-        room.setRoomId(id);
+        room.setId(id);
         this.rr.save(room);
 
     }

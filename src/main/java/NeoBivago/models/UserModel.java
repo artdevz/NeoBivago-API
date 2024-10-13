@@ -36,57 +36,54 @@ public class UserModel implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private UUID userId;
+    private UUID id;
 
     @Column(name = "name")
-    private String userName;
+    private String name;
 
     @Email
     @Column(name = "email")
-    private String userEmail;
+    private String email;
 
     @Column(name = "password")
-    private String userPassword;
+    private String password;
 
     @Column(name = "cpf")
-    private String userCPF;
+    private String cpf;
 
     @Column(name = "birthday")
-    private Date userBirthday;
+    private Date birthday;
 
     @Column(name = "role")
-    private ERole userRole;
+    private ERole role;
 
     // Constructors:
     public UserModel(String userName, String userEmail, String userPassword, String userCPF, Date userBirthday) {
 
-        this.userName = userName;
-        this.userEmail = userEmail;
-        this.userPassword = userPassword;
-        this.userCPF = userCPF;
-        this.userRole = ERole.USER;
+        this.name = userName;
+        this.email = userEmail;
+        this.password = userPassword;
+        this.cpf = userCPF;
+        this.birthday = userBirthday;
+        this.role = ERole.USER;
 
     }
 
     // GettersAndSetters:
 
-    public String getUserName() {
-        return userName;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(this.userRole.getRole()));
+        return List.of(new SimpleGrantedAuthority(this.role.getRole()));
     }
 
     @Override
     public String getPassword() {
-        return userPassword;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return userEmail;
+        return email;
     }
     
 }
