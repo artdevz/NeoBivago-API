@@ -1,8 +1,12 @@
 package NeoBivago.services;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +38,21 @@ public class UserService {
 
     }
 
-    public void update(UUID id, UserModel user) {
+    public UserModel update(UUID id, Map<String, Object> fields) {
 
-        user.setId(id);
-        this.ur.save(user);        
+        Optional<UserModel> existingUser = this.ur.findById(id);
+
+        if (existingUser.isPresent()) {
+
+            fields.forEach((key, value) -> {
+                Field field = ReflectionUtils.findField(UserModel.class, key);
+                field.setAccessible(true);
+                ReflectionUtils.setField(field, existingUser.get(), value);
+            });
+            return ur.save(existingUser.get());
+
+        }
+        return null;
 
     }
 

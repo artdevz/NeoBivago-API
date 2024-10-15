@@ -1,9 +1,13 @@
 package NeoBivago.services;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
 import NeoBivago.exceptions.AttributeRegisteredException;
 import NeoBivago.models.RoomModel;
@@ -23,10 +27,21 @@ public class RoomService {
 
     }
 
-    public void update(UUID id, RoomModel room) {
-        
-        room.setId(id);
-        this.rr.save(room);
+    public RoomModel update(UUID id, Map<String, Object> fields) {
+
+        Optional<RoomModel> existingRoom = this.rr.findById(id);
+
+        if (existingRoom.isPresent()) {
+
+            fields.forEach((key, value) -> {
+                Field field = ReflectionUtils.findField(RoomModel.class, key);
+                field.setAccessible(true);
+                ReflectionUtils.setField(field, existingRoom.get(), value);
+            });
+            return rr.save(existingRoom.get());
+
+        }
+        return null;
 
     }
 

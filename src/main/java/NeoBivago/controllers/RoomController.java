@@ -1,6 +1,7 @@
 package NeoBivago.controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -9,9 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +43,7 @@ public class RoomController {
 
         try {
             this.rs.create(newRoom);
-            return new ResponseEntity<>("Created Room", HttpStatus.OK);
+            return new ResponseEntity<>("Created Room", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -76,11 +77,11 @@ public class RoomController {
 
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateRoom(@RequestBody RoomModel room, @PathVariable UUID id) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<String> updateRoom(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
 
         try {
-            this.rs.update(id, room);
+            this.rs.update(id, fields);
             return new ResponseEntity<>("Updated Room", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);

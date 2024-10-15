@@ -1,9 +1,13 @@
 package NeoBivago.services;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
 import NeoBivago.exceptions.AttributeRegisteredException;
 import NeoBivago.exceptions.LenghtException;
@@ -31,13 +35,23 @@ public class HotelService {
 
     }
 
-    public void update(UUID id, HotelModel hotel) {
-        
-        hotel.setId(id);
-        this.hr.save(hotel);
+    public HotelModel update(UUID id, Map<String, Object> fields) {
+
+        Optional<HotelModel> existingHotel = this.hr.findById(id);
+
+        if (existingHotel.isPresent()) {
+
+            fields.forEach((key, value) -> {
+                Field field = ReflectionUtils.findField(HotelModel.class, key);
+                field.setAccessible(true);
+                ReflectionUtils.setField(field, existingHotel.get(), value);
+            });
+            return hr.save(existingHotel.get());
+
+        }
+        return null;
 
     }
-
     public void delete(UUID id) {
         this.hr.deleteById(id);
     }
