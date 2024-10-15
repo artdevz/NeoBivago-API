@@ -36,13 +36,13 @@ public class AuthController {
     TokenService ts;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signUpAccount(@RequestBody @Valid RegisterDTO data) {
+    public ResponseEntity<Object> signUpAccount(@RequestBody @Valid RegisterDTO data) {
 
         UserModel newUser = new UserModel(data.name(), data.email(), data.password(), data.cpf(), data.birthday() );
 
         try {
             this.us.create(newUser);
-            return new ResponseEntity<>("Created new User", HttpStatus.OK);
+            return new ResponseEntity<>(newUser, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }   
