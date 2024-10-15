@@ -36,13 +36,13 @@ public class RoomController {
     // CRUD:
 
     @PostMapping
-    public ResponseEntity<Object> createRoom(@RequestBody @Valid RoomDTO data) {
+    public ResponseEntity<String> createRoom(@RequestBody @Valid RoomDTO data) {
 
         RoomModel newRoom = new RoomModel(data.hotel(), data.number(), data.capacity(), data.price(), data.type());
 
         try {
             this.rs.create(newRoom);
-            return new ResponseEntity<>(newRoom, HttpStatus.OK);
+            return new ResponseEntity<>("Created Room", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

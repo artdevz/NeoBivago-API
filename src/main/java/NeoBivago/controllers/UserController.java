@@ -35,13 +35,13 @@ public class UserController {
     // CRUD:
 
     @PostMapping
-    public ResponseEntity<Object> createUser(@RequestBody @Valid RegisterDTO data) {
+    public ResponseEntity<String> createUser(@RequestBody @Valid RegisterDTO data) {
                 
         UserModel newUser = new UserModel(data.name(), data.email(), data.password(), data.cpf(), data.birthday() );
 
         try {
             this.us.create(newUser);
-            return new ResponseEntity<>(newUser, HttpStatus.OK);
+            return new ResponseEntity<>("Created User", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }        

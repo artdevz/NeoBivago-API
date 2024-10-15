@@ -35,13 +35,13 @@ public class ReservationController {
     // CRUD:
 
     @PostMapping
-    public ResponseEntity<Object> createRoom(@RequestBody @Valid ReservationDTO data) {
+    public ResponseEntity<String> createRoom(@RequestBody @Valid ReservationDTO data) {
 
         ReservationModel newReservation = new ReservationModel(data.user(), data.hotel(), data.room(), data.checkIn(), data.checkOut(), data.nop(), data.price());
 
         try {
             this.rs.create(newReservation);
-            return new ResponseEntity<>(newReservation, HttpStatus.OK);
+            return new ResponseEntity<>("Created Reservation", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
