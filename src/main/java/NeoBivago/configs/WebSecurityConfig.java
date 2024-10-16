@@ -1,18 +1,14 @@
-package NeoBivago.security;
+package NeoBivago.configs;
 
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -25,6 +21,9 @@ public class WebSecurityConfig {
     
     @Autowired
     JwtFilter jf;
+
+    @Autowired
+    AuthenticationProvider authenticationProvider;    
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -40,8 +39,7 @@ public class WebSecurityConfig {
         return source;
 
     }
-
-    @SuppressWarnings("removal")
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -49,28 +47,16 @@ public class WebSecurityConfig {
         .cors(c -> c.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable())
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(request -> {
+        .authorizeHttpRequests(request -> request
 
-            request.requestMatchers(HttpMethod.GET, "/**").permitAll();
-            request.requestMatchers(HttpMethod.POST, "/**").permitAll();
-            request.requestMatchers(HttpMethod.PATCH, "/**").permitAll();
-            request.requestMatchers(HttpMethod.DELETE, "/**").permitAll();
-            request.anyRequest().authenticated().and().addFilterBefore(jf, UsernamePasswordAuthenticationFilter.class);
+            .requestMatchers( "/**").permitAll()
+            .anyRequest().authenticated())
 
-        });
+        .authenticationProvider(authenticationProvider)
+        .addFilterBefore(jf, UsernamePasswordAuthenticationFilter.class);        
 
         return http.build();
 
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    }    
 
 }

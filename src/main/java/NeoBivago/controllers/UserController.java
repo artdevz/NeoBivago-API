@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import NeoBivago.dto.auth.RegisterDTO;
+import NeoBivago.dto.user.UserDTO;
 import NeoBivago.models.UserModel;
 import NeoBivago.repositories.UserRepository;
 import NeoBivago.services.UserService;
@@ -36,7 +36,7 @@ public class UserController {
     // CRUD:
 
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody @Valid RegisterDTO data) {
+    public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO data) {
                 
         UserModel newUser = new UserModel(data.name(), data.email(), data.password(), data.cpf(), data.birthday() );
 

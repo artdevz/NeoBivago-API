@@ -1,3 +1,3 @@
-package NeoBivago.dto.auth;
+package NeoBivago.auth;
 
 public record LoginDTO(String email, String password) {} 
