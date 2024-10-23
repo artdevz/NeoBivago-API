@@ -23,7 +23,7 @@ import NeoBivago.repositories.ReservationRepository;
 import NeoBivago.services.ReservationService;
 import jakarta.validation.Valid;
 
-@RequestMapping("/api/reservation")
+@RequestMapping("/reservation")
 @RestController
 public class ReservationController {
     

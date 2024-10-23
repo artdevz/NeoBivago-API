@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RestController
 public class LoginController {
     
