@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
-import NeoBivago.exceptions.AttributeRegisteredException;
+import NeoBivago.entities.Hotel;
+import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.LenghtException;
-import NeoBivago.models.HotelModel;
 import NeoBivago.repositories.HotelRepository;
 
 @Service
@@ -23,26 +23,32 @@ public class HotelService {
     @Autowired
     HotelRepository hr;
 
-    public void create(HotelModel hotel) throws Exception {
+    public void create(Hotel hotel) throws Exception {
         
-        if (this.hr.findByName(hotel.getName()) != null) throw new AttributeRegisteredException("Hotel is already being used.");
+        if (this.hr.findByName(hotel.getName()) != null) throw new ExistingAttributeException(
+            "Hotel is already being used.");
 
-        if ( (hotel.getName().length() < MINLENGHT) || (hotel.getName().length() > MAXLENGHT) ) throw new LenghtException("HotelName must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
-        if ( (hotel.getAddress().length() < MINLENGHT) || (hotel.getAddress().length() > MAXLENGHT) ) throw new LenghtException("HotelAddress must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
-        if ( (hotel.getCity().length() < MINLENGHT) || (hotel.getCity().length() > MAXLENGHT) ) throw new LenghtException("HotelCity must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
+        if ( (hotel.getName().length() < MINLENGHT) || (hotel.getName().length() > MAXLENGHT) ) throw new LenghtException(
+            "Hotel Name must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
+        
+        if ( (hotel.getAddress().length() < MINLENGHT) || (hotel.getAddress().length() > MAXLENGHT) ) throw new LenghtException(
+            "Hotel Address must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
+        
+        if ( (hotel.getCity().length() < MINLENGHT) || (hotel.getCity().length() > MAXLENGHT) ) throw new LenghtException(
+            "Hotel City must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
 
         this.hr.save(hotel);
 
     }
 
-    public HotelModel update(UUID id, Map<String, Object> fields) {
+    public Hotel update(UUID id, Map<String, Object> fields) {
 
-        Optional<HotelModel> existingHotel = this.hr.findById(id);
+        Optional<Hotel> existingHotel = this.hr.findById(id);
 
         if (existingHotel.isPresent()) {
 
             fields.forEach((key, value) -> {
-                Field field = ReflectionUtils.findField(HotelModel.class, key);
+                Field field = ReflectionUtils.findField(Hotel.class, key);
                 field.setAccessible(true);
                 ReflectionUtils.setField(field, existingHotel.get(), value);
             });

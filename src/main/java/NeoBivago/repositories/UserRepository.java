@@ -6,12 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 
-import NeoBivago.models.UserModel;
+import NeoBivago.entities.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserModel, UUID> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     UserDetails findByEmail(String email);
-    UserModel findByCpf(String cpf);
+    User findByCpf(String cpf);
 
 } 

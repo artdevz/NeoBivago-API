@@ -5,11 +5,11 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import NeoBivago.models.HotelModel;
+import NeoBivago.entities.Hotel;
 
 @Repository
-public interface HotelRepository extends JpaRepository<HotelModel, UUID> {
+public interface HotelRepository extends JpaRepository<Hotel, UUID> {
 
-    HotelModel findByName(String hotelName);
+    Hotel findByName(String hotelName);
 
 }

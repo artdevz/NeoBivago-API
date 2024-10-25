@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import NeoBivago.dto.room.RoomDTO;
 import NeoBivago.dto.room.RoomFilterDTO;
-import NeoBivago.models.RoomModel;
+import NeoBivago.entities.Room;
+import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.repositories.RoomRepository;
 import NeoBivago.services.RoomService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @RequestMapping("/room")
@@ -39,39 +41,46 @@ public class RoomController {
     @PostMapping
     public ResponseEntity<String> createRoom(@RequestBody @Valid RoomDTO data) {
 
-        RoomModel newRoom = new RoomModel(data.hotel(), data.number(), data.capacity(), data.price(), data.type());
+        Room newRoom = new Room(data.hotel(), data.number(), data.capacity(), data.price(), data.type());
 
         try {
             this.rs.create(newRoom);
             return new ResponseEntity<>("Created Room", HttpStatus.CREATED);
-        } catch (Exception e) {
+        }
+
+        catch (ExistingAttributeException e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
+        }
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
     }
 
     @GetMapping
-    public ResponseEntity<List<RoomModel>> readAllRooms() {
+    public ResponseEntity<List<Room>> readAllRooms() {
 
-        List<RoomModel> roomList = this.rr.findAll();
+        List<Room> roomList = this.rr.findAll();
 
         return new ResponseEntity<>(roomList, HttpStatus.OK);
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<RoomModel>> findRoomById(@PathVariable UUID id) {
+    public ResponseEntity<Optional<Room>> findRoomById(@PathVariable UUID id) {
 
-        Optional<RoomModel> room = this.rr.findById(id);
+        Optional<Room> room = this.rr.findById(id);
 
         return new ResponseEntity<>(room, HttpStatus.OK);
 
     }
     
+    @Operation(summary = "Find All Rooms in NeoBivago", description = "Return a list of all rooms registered in NeoBivago.")
     @GetMapping("/filter")
-    public ResponseEntity<List<RoomModel>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
+    public ResponseEntity<List<Room>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
 
-        List<RoomModel> roomList = this.rr.roomFilter(data.hotel(), data.capacity(), data.price(), data.type());
+        List<Room> roomList = this.rr.roomFilter(data.capacity(), data.price(), data.type());
 
         return new ResponseEntity<>(roomList, HttpStatus.OK);
 
@@ -83,7 +92,9 @@ public class RoomController {
         try {
             this.rs.update(id, fields);
             return new ResponseEntity<>("Updated Room", HttpStatus.OK);
-        } catch (Exception e) {
+        } 
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -95,7 +106,9 @@ public class RoomController {
         try {
             this.rs.delete(id);
             return new ResponseEntity<>("Deleted Room", HttpStatus.OK);
-        } catch (Exception e) {
+        } 
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 

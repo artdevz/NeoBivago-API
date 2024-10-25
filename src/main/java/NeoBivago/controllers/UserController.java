@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import NeoBivago.dto.user.UserDTO;
-import NeoBivago.models.UserModel;
+import NeoBivago.entities.User;
+import NeoBivago.exceptions.UnauthorizedDateException;
+import NeoBivago.exceptions.ExistingAttributeException;
+import NeoBivago.exceptions.LenghtException;
 import NeoBivago.repositories.UserRepository;
 import NeoBivago.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,12 +42,26 @@ public class UserController {
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO data) {
                 
-        UserModel newUser = new UserModel(data.name(), data.email(), data.password(), data.cpf(), data.birthday() );
+        User newUser = new User(data.name(), data.email(), data.password(), data.cpf(), data.birthday() );
 
         try {
             this.us.create(newUser);
             return new ResponseEntity<>("Created User", HttpStatus.CREATED);
-        } catch (Exception e) {
+        }
+
+        catch (ExistingAttributeException e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
+        }
+        
+        catch (LenghtException e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        catch (UnauthorizedDateException e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.FORBIDDEN);
+        } 
+
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }        
 
@@ -52,18 +69,18 @@ public class UserController {
 
     @Operation(summary = "Find All Users in NeoBivago", description = "Return a list of all users registered in NeoBivago.")
     @GetMapping
-    public ResponseEntity<List<UserModel>> readAllUsers() {
+    public ResponseEntity<List<User>> readAllUsers() {
 
-        List<UserModel> userList = this.ur.findAll();
+        List<User> userList = this.ur.findAll();
 
         return new ResponseEntity<>(userList, HttpStatus.OK);
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<UserModel>> findUserById(@PathVariable UUID id) {
+    public ResponseEntity<Optional<User>> findUserById(@PathVariable UUID id) {
 
-        Optional<UserModel> user = this.ur.findById(id);
+        Optional<User> user = this.ur.findById(id);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
 
@@ -75,7 +92,9 @@ public class UserController {
         try {
             this.us.update(id, fields);
             return new ResponseEntity<>("Updated User", HttpStatus.OK);
-        } catch (Exception e) {
+        } 
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -87,7 +106,9 @@ public class UserController {
         try {
             this.us.delete(id);
             return new ResponseEntity<>("Deleted User", HttpStatus.OK);
-        } catch (Exception e) {
+        } 
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 

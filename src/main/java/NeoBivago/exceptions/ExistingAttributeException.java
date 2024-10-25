@@ -1,8 +1,8 @@
 package NeoBivago.exceptions;
 
-public class LenghtException extends RuntimeException {
+public class ExistingAttributeException extends RuntimeException {
     
-    public LenghtException(String message) {
+    public ExistingAttributeException(String message) {
         super(message);
     }
 

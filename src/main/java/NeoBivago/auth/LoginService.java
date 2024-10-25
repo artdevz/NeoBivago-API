@@ -6,7 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import NeoBivago.configs.JwtService;
-import NeoBivago.models.UserModel;
+import NeoBivago.entities.User;
 
 @Service
 public class LoginService {
@@ -23,7 +23,7 @@ public class LoginService {
     public String signIn(LoginDTO data) {
         
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.email(), data.password()));
-        UserModel user = lr.findByEmail(data.email()).get();        
+        User user = lr.findByEmail(data.email()).get();        
         String token = js.generateToken(user);
 
         return token;

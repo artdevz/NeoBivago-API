@@ -1,9 +1,8 @@
-package NeoBivago.models;
+package NeoBivago.entities;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-import NeoBivago.enums.ERoomType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,8 +19,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "rooms")
-public class RoomModel implements Serializable {
+@Table(name = "hotels")
+public class Hotel implements Serializable {
     
     // Attributes:
 
@@ -31,29 +30,30 @@ public class RoomModel implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "hotel")
-    private UUID hotel;
+    @Column(name = "owner_id")
+    private UUID owner;
 
-    @Column(name = "number")
-    private int number;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "capacity")
-    private int capacity;
+    @Column(name = "address")
+    private String address;
 
-    @Column(name = "price")
-    private int price; // Cents
+    @Column(name = "city")
+    private String city;
 
-    @Column(name = "type")
-    private ERoomType type;    
+    @Column(name = "score")
+    private float score;
 
     // Constructors:
-    public RoomModel(UUID hotel, int number, int capacity, int price, ERoomType type) {
 
-        this.hotel = hotel;
-        this.number = number;
-        this.capacity = capacity;
-        this.price = price;
-        this.type = type;
+    public Hotel(UUID owner, String name, String address, String city, float score) {
+
+        this.owner = owner;
+        this.name = name;
+        this.address = address;
+        this.city = city;
+        this.score = score;
         
     }
 
