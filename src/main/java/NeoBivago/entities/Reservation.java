@@ -1,4 +1,4 @@
-package NeoBivago.models;
+package NeoBivago.entities;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,7 +21,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "reservations")
-public class ReservationModel implements Serializable {
+public class Reservation implements Serializable {
 
     // Attributes:
 
@@ -53,7 +53,7 @@ public class ReservationModel implements Serializable {
     private int price; // Cents
 
     // Constructors:
-    public ReservationModel(UUID user, UUID hotel, UUID room, Date checkIn, Date checkOut, int nop, int price) {
+    public Reservation(UUID user, UUID hotel, UUID room, Date checkIn, Date checkOut, int nop, int price) {
 
         this.user = user;
         this.hotel = hotel;

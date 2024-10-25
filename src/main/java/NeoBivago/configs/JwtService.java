@@ -9,7 +9,7 @@ import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import NeoBivago.models.UserModel;
+import NeoBivago.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -18,7 +18,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
     
-    public String generateToken(UserModel user) {
+    public String generateToken(User user) {
 
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("username", user.getName());

@@ -18,9 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import NeoBivago.dto.hotel.HotelDTO;
-import NeoBivago.models.HotelModel;
+import NeoBivago.entities.Hotel;
+import NeoBivago.exceptions.ExistingAttributeException;
+import NeoBivago.exceptions.LenghtException;
 import NeoBivago.repositories.HotelRepository;
 import NeoBivago.services.HotelService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @RequestMapping("/hotel")
@@ -38,30 +41,41 @@ public class HotelController {
     @PostMapping
     public ResponseEntity<String> createHotel(@RequestBody @Valid HotelDTO data) {
 
-        HotelModel newHotel = new HotelModel(data.owner(), data.name(), data.address(), data.city(), data.score());
+        Hotel newHotel = new Hotel(data.owner(), data.name(), data.address(), data.city(), data.score());
 
         try {
             this.hs.create(newHotel);
             return new ResponseEntity<>("Created Hotel", HttpStatus.CREATED);
-        } catch (Exception e) {
+        }
+        
+        catch (ExistingAttributeException e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
+        }
+
+        catch (LenghtException e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.FORBIDDEN);
+        }
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
     }
 
+    @Operation(summary = "Find All Hotels in NeoBivago", description = "Return a list of all hotels registered in NeoBivago.")
     @GetMapping
-    public ResponseEntity<List<HotelModel>> readAllHotels() {
+    public ResponseEntity<List<Hotel>> readAllHotels() {
 
-        List<HotelModel> hotelList = this.hr.findAll();
+        List<Hotel> hotelList = this.hr.findAll();
 
         return new ResponseEntity<>(hotelList, HttpStatus.OK);
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<HotelModel>> findHotelById(@PathVariable UUID id) {
+    public ResponseEntity<Optional<Hotel>> findHotelById(@PathVariable UUID id) {
 
-        Optional<HotelModel> hotel = this.hr.findById(id);
+        Optional<Hotel> hotel = this.hr.findById(id);
 
         return new ResponseEntity<>(hotel, HttpStatus.OK);
 
@@ -73,7 +87,9 @@ public class HotelController {
         try {
             this.hs.update(id, fields);
             return new ResponseEntity<>("Updated Hotel", HttpStatus.OK);
-        } catch (Exception e) {
+        } 
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -85,7 +101,9 @@ public class HotelController {
         try {
             this.hs.delete(id);
             return new ResponseEntity<>("Deleted Hotel", HttpStatus.OK);
-        } catch (Exception e) {
+        } 
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 

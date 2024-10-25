@@ -1,12 +1,11 @@
 package NeoBivago.exceptions;
 
-public class AttributeRegisteredException extends Exception {
+public class UnauthorizedDateException extends RuntimeException {
     
-    public AttributeRegisteredException(String message) {
+    public UnauthorizedDateException(String message) {
         super(message);
     }
 
     private static final long serialVersionUID = 1L;
 
 }
-

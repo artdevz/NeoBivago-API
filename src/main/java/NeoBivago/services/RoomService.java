@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
-import NeoBivago.exceptions.AttributeRegisteredException;
-import NeoBivago.models.RoomModel;
+import NeoBivago.entities.Room;
+import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.repositories.RoomRepository;
 
 @Service
@@ -19,22 +19,23 @@ public class RoomService {
     @Autowired
     RoomRepository rr;
 
-    public void create(RoomModel room) throws Exception {
+    public void create(Room room) throws Exception {
 
-        if (this.rr.findByNumber(room.getNumber()) != null) throw new AttributeRegisteredException("RoomNumber is already being used.");
+        if (this.rr.findByNumber(room.getNumber()) != null) throw new ExistingAttributeException(
+            "Room Number is already being used.");
 
         this.rr.save(room);
 
     }
 
-    public RoomModel update(UUID id, Map<String, Object> fields) {
+    public Room update(UUID id, Map<String, Object> fields) {
 
-        Optional<RoomModel> existingRoom = this.rr.findById(id);
+        Optional<Room> existingRoom = this.rr.findById(id);
 
         if (existingRoom.isPresent()) {
 
             fields.forEach((key, value) -> {
-                Field field = ReflectionUtils.findField(RoomModel.class, key);
+                Field field = ReflectionUtils.findField(Room.class, key);
                 field.setAccessible(true);
                 ReflectionUtils.setField(field, existingRoom.get(), value);
             });

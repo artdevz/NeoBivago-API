@@ -1,4 +1,4 @@
-package NeoBivago.models;
+package NeoBivago.entities;
 
 import java.util.Collection;
 import java.util.Date;
@@ -28,7 +28,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class UserModel implements UserDetails {
+public class User implements UserDetails {
 
     // Attributes:
 
@@ -58,7 +58,7 @@ public class UserModel implements UserDetails {
     private ERole role;
 
     // Constructors:
-    public UserModel(String userName, String userEmail, String userPassword, String userCPF, Date userBirthday) {
+    public User(String userName, String userEmail, String userPassword, String userCPF, Date userBirthday) {
 
         this.name = userName;
         this.email = userEmail;
