@@ -24,7 +24,7 @@ import NeoBivago.repositories.RoomRepository;
 import NeoBivago.services.RoomService;
 import jakarta.validation.Valid;
 
-@RequestMapping("/api/room")
+@RequestMapping("/room")
 @RestController
 public class RoomController {
     

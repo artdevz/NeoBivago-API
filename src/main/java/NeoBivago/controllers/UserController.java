@@ -21,9 +21,10 @@ import NeoBivago.dto.user.UserDTO;
 import NeoBivago.models.UserModel;
 import NeoBivago.repositories.UserRepository;
 import NeoBivago.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
-@RequestMapping("/api/user")
+@RequestMapping("/user")
 @RestController
 public class UserController {
 
@@ -49,6 +50,7 @@ public class UserController {
 
     }
 
+    @Operation(summary = "Find All Users in NeoBivago", description = "Return a list of all users registered in NeoBivago.")
     @GetMapping
     public ResponseEntity<List<UserModel>> readAllUsers() {
 
