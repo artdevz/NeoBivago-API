@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import NeoBivago.dto.user.UserDTO;
 import NeoBivago.entities.User;
-import NeoBivago.enums.ERole;
 import NeoBivago.enums.ERoleRepository;
 import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.exceptions.ExistingAttributeException;
@@ -47,10 +46,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO data) {
         
-        Optional<ERole> optionalRole = rr.findById(data.role());
-        if (!optionalRole.isPresent()) return ResponseEntity.badRequest().body(null);        
-
-        User newUser = new User(data.name(), data.email(), data.password(), data.cpf(), data.birthday(), optionalRole );
+        User newUser = new User(data.name(), data.email(), data.password(), data.cpf(), data.birthday(), rr.findByName(data.role().getName()) );
 
         try {
             this.us.create(newUser);
