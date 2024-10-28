@@ -4,11 +4,16 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,14 +36,15 @@ public class Reservation implements Serializable {
     @Column(name = "id")
     private UUID reservationId;
 
-    @Column(name = "user")
-    private UUID user;
-
-    @Column(name = "hotel")
-    private UUID hotel;
-
-    @Column(name = "room")
-    private UUID room;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user", nullable = false)
+    @JsonBackReference
+    private User user;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "room_id", nullable = false)
+    @JsonBackReference
+    private Room room;
 
     @Column(name = "checkIn")
     private Date checkIn;
@@ -53,10 +59,9 @@ public class Reservation implements Serializable {
     private int price; // Cents
 
     // Constructors:
-    public Reservation(UUID user, UUID hotel, UUID room, Date checkIn, Date checkOut, int nop, int price) {
+    public Reservation(User user, Room room, Date checkIn, Date checkOut, int nop, int price) {
 
         this.user = user;
-        this.hotel = hotel;
         this.room = room;
         this.checkIn = checkIn;
         this.checkOut = checkOut;

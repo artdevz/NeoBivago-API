@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.reservation.ReservationDTO;
 import NeoBivago.entities.Reservation;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.repositories.ReservationRepository;
+import NeoBivago.services.MappingService;
 import NeoBivago.services.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -31,21 +33,28 @@ import jakarta.validation.Valid;
 public class ReservationController {
     
     @Autowired
-    ReservationRepository rr;
+    ReservationRepository reservationR;
 
     @Autowired
-    ReservationService rs;
+    ReservationService reservationS;
+
+    @Autowired
+    MappingService mappingS;
 
     // CRUD:
 
     @PostMapping
     public ResponseEntity<String> createRoom(@RequestBody @Valid ReservationDTO data) {
 
-        Reservation newReservation = new Reservation(data.user(), data.hotel(), data.room(), data.checkIn(), data.checkOut(), data.nop(), data.price());
-
+        
         try {
-            this.rs.create(newReservation);
+            Reservation newReservation = new Reservation(mappingS.findUserById(data.user()), mappingS.findRoomById(data.room()), data.checkIn(), data.checkOut(), data.nop(), data.price());
+            this.reservationS.create(newReservation);
             return new ResponseEntity<>("Created Reservation", HttpStatus.CREATED);
+        }
+
+        catch (ResponseStatusException e) {
+            return new ResponseEntity<>("User or Room not found.", HttpStatus.NOT_FOUND);
         }
         
         catch (UnauthorizedDateException e) {
@@ -65,7 +74,7 @@ public class ReservationController {
     @GetMapping
     public ResponseEntity<List<Reservation>> readAllReservations() {
 
-        List<Reservation> reservationList = this.rr.findAll();
+        List<Reservation> reservationList = this.reservationR.findAll();
 
         return new ResponseEntity<>(reservationList, HttpStatus.OK);
 
@@ -75,7 +84,7 @@ public class ReservationController {
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Reservation>> findReservationById(@PathVariable UUID id) {
 
-        Optional<Reservation> reservation = this.rr.findById(id);
+        Optional<Reservation> reservation = this.reservationR.findById(id);
 
         return new ResponseEntity<>(reservation, HttpStatus.OK);
 
@@ -85,7 +94,7 @@ public class ReservationController {
     public ResponseEntity<String> updateReservation(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
 
         try {
-            this.rs.update(id, fields);
+            this.reservationS.update(id, fields);
             return new ResponseEntity<>("Updated Reservation", HttpStatus.OK);
         } 
         
@@ -99,9 +108,13 @@ public class ReservationController {
     public ResponseEntity<String> deleteReservation(@PathVariable UUID id) {
 
         try {
-            this.rs.delete(id);
+            this.reservationS.delete(id);
             return new ResponseEntity<>("Deleted Reservation", HttpStatus.OK);
-        } 
+        }
+        
+        catch (ResponseStatusException e) {
+            return new ResponseEntity<>("Reservation not found.", HttpStatus.NOT_FOUND);
+        }
         
         catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);

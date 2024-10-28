@@ -6,8 +6,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.entities.Room;
 import NeoBivago.exceptions.ExistingAttributeException;
@@ -17,20 +19,20 @@ import NeoBivago.repositories.RoomRepository;
 public class RoomService {
     
     @Autowired
-    RoomRepository rr;
+    RoomRepository roomR;
 
     public void create(Room room) throws Exception {
 
-        if (this.rr.findByNumber(room.getNumber()) != null) throw new ExistingAttributeException(
+        if (this.roomR.findByNumber(room.getNumber()) != null) throw new ExistingAttributeException(
             "Room Number is already being used.");
 
-        this.rr.save(room);
+        this.roomR.save(room);
 
     }
 
     public Room update(UUID id, Map<String, Object> fields) {
 
-        Optional<Room> existingRoom = this.rr.findById(id);
+        Optional<Room> existingRoom = this.roomR.findById(id);
 
         if (existingRoom.isPresent()) {
 
@@ -39,7 +41,7 @@ public class RoomService {
                 field.setAccessible(true);
                 ReflectionUtils.setField(field, existingRoom.get(), value);
             });
-            return rr.save(existingRoom.get());
+            return roomR.save(existingRoom.get());
 
         }
         return null;
@@ -47,7 +49,10 @@ public class RoomService {
     }
 
     public void delete(UUID id) {
-        this.rr.deleteById(id);
+
+        if (!roomR.findById(id).isPresent()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        this.roomR.deleteById(id);
+
     }
 
 }

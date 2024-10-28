@@ -6,8 +6,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.entities.Hotel;
 import NeoBivago.exceptions.ExistingAttributeException;
@@ -21,11 +23,11 @@ public class HotelService {
     private final int MAXLENGHT = 32;
 
     @Autowired
-    HotelRepository hr;
+    HotelRepository hotelR;
 
     public void create(Hotel hotel) throws Exception {
         
-        if (this.hr.findByName(hotel.getName()) != null) throw new ExistingAttributeException(
+        if (this.hotelR.findByName(hotel.getName()) != null) throw new ExistingAttributeException(
             "Hotel is already being used.");
 
         if ( (hotel.getName().length() < MINLENGHT) || (hotel.getName().length() > MAXLENGHT) ) throw new LenghtException(
@@ -37,13 +39,13 @@ public class HotelService {
         if ( (hotel.getCity().length() < MINLENGHT) || (hotel.getCity().length() > MAXLENGHT) ) throw new LenghtException(
             "Hotel City must contain between " + MINLENGHT + " and " + MAXLENGHT + " characters.");
 
-        this.hr.save(hotel);
+        this.hotelR.save(hotel);
 
     }
 
     public Hotel update(UUID id, Map<String, Object> fields) {
 
-        Optional<Hotel> existingHotel = this.hr.findById(id);
+        Optional<Hotel> existingHotel = this.hotelR.findById(id);
 
         if (existingHotel.isPresent()) {
 
@@ -52,14 +54,17 @@ public class HotelService {
                 field.setAccessible(true);
                 ReflectionUtils.setField(field, existingHotel.get(), value);
             });
-            return hr.save(existingHotel.get());
+            return hotelR.save(existingHotel.get());
 
         }
         return null;
 
     }
     public void delete(UUID id) {
-        this.hr.deleteById(id);
+
+        if (!hotelR.findById(id).isPresent()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        this.hotelR.deleteById(id);
+
     }
 
 }

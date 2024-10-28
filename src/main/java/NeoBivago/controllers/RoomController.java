@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.room.RoomDTO;
 import NeoBivago.dto.room.RoomFilterDTO;
 import NeoBivago.entities.Room;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.repositories.RoomRepository;
+import NeoBivago.services.MappingService;
 import NeoBivago.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -31,21 +33,28 @@ import jakarta.validation.Valid;
 public class RoomController {
     
     @Autowired
-    RoomRepository rr;
+    RoomRepository roomR;
 
     @Autowired
-    RoomService rs;
+    RoomService roomS;
+
+    @Autowired
+    MappingService mappingS;
 
     // CRUD:
 
     @PostMapping
     public ResponseEntity<String> createRoom(@RequestBody @Valid RoomDTO data) {
-
-        Room newRoom = new Room(data.hotel(), data.number(), data.capacity(), data.price(), data.type());
-
+        
+        
         try {
-            this.rs.create(newRoom);
+            Room newRoom = new Room(mappingS.findHotelById(data.hotel()), data.number(), data.capacity(), data.price(), mappingS.getCategory(data.category().getCategory()));
+            this.roomS.create(newRoom);
             return new ResponseEntity<>("Created Room", HttpStatus.CREATED);
+        }
+
+        catch (ResponseStatusException e) {
+            return new ResponseEntity<>("Hotel not found.", HttpStatus.NOT_FOUND);
         }
 
         catch (ExistingAttributeException e) {
@@ -61,7 +70,7 @@ public class RoomController {
     @GetMapping
     public ResponseEntity<List<Room>> readAllRooms() {
 
-        List<Room> roomList = this.rr.findAll();
+        List<Room> roomList = this.roomR.findAll();
 
         return new ResponseEntity<>(roomList, HttpStatus.OK);
 
@@ -70,7 +79,7 @@ public class RoomController {
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Room>> findRoomById(@PathVariable UUID id) {
 
-        Optional<Room> room = this.rr.findById(id);
+        Optional<Room> room = this.roomR.findById(id);
 
         return new ResponseEntity<>(room, HttpStatus.OK);
 
@@ -80,7 +89,7 @@ public class RoomController {
     @GetMapping("/filter")
     public ResponseEntity<List<Room>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
 
-        List<Room> roomList = this.rr.roomFilter(data.capacity(), data.price(), data.type());
+        List<Room> roomList = this.roomR.roomFilter(data.capacity(), data.price(), data.category());
 
         return new ResponseEntity<>(roomList, HttpStatus.OK);
 
@@ -90,7 +99,7 @@ public class RoomController {
     public ResponseEntity<String> updateRoom(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
 
         try {
-            this.rs.update(id, fields);
+            this.roomS.update(id, fields);
             return new ResponseEntity<>("Updated Room", HttpStatus.OK);
         } 
         
@@ -104,9 +113,13 @@ public class RoomController {
     public ResponseEntity<String> deleteRoom(@PathVariable UUID id) {
 
         try {
-            this.rs.delete(id);
+            this.roomS.delete(id);
             return new ResponseEntity<>("Deleted Room", HttpStatus.OK);
-        } 
+        }
+        
+        catch (ResponseStatusException e) {
+            return new ResponseEntity<>("Room not found.", HttpStatus.NOT_FOUND);
+        }
         
         catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);

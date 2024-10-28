@@ -1,5 +1,6 @@
 package NeoBivago.entities;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +10,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import NeoBivago.enums.ERole;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,6 +24,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -64,6 +69,14 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id", nullable = false)
     private ERole role;
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Hotel> hotels = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Reservation> reservations = new ArrayList<>();
+
     // Constructors:
     public User(String userName, String userEmail, String userPassword, String userCPF, Date userBirthday, ERole role) {
 
@@ -72,7 +85,7 @@ public class User implements UserDetails {
         this.password = userPassword;
         this.cpf = userCPF;
         this.birthday = userBirthday;
-        this.setRole(role);
+        this.role = role;
 
     }
 
