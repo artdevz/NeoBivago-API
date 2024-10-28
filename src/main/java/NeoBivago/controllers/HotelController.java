@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.hotel.HotelDTO;
 import NeoBivago.entities.Hotel;
@@ -23,6 +24,7 @@ import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.LenghtException;
 import NeoBivago.repositories.HotelRepository;
 import NeoBivago.services.HotelService;
+import NeoBivago.services.MappingService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
@@ -31,21 +33,28 @@ import jakarta.validation.Valid;
 public class HotelController {
     
     @Autowired
-    HotelRepository hr;
+    HotelRepository hotelR;
 
     @Autowired
-    HotelService hs;
+    HotelService hotelS;
+
+    @Autowired
+    MappingService mappingS;
 
     // CRUD:
 
     @PostMapping
     public ResponseEntity<String> createHotel(@RequestBody @Valid HotelDTO data) {
 
-        Hotel newHotel = new Hotel(data.owner(), data.name(), data.address(), data.city(), data.score());
-
+        
         try {
-            this.hs.create(newHotel);
+            Hotel newHotel = new Hotel(mappingS.findUserById(data.owner()), data.name(), data.address(), data.city(), data.score());
+            this.hotelS.create(newHotel);
             return new ResponseEntity<>("Created Hotel", HttpStatus.CREATED);
+        }
+
+        catch (ResponseStatusException e) {
+            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
         }
         
         catch (ExistingAttributeException e) {
@@ -66,7 +75,7 @@ public class HotelController {
     @GetMapping
     public ResponseEntity<List<Hotel>> readAllHotels() {
 
-        List<Hotel> hotelList = this.hr.findAll();
+        List<Hotel> hotelList = this.hotelR.findAll();
 
         return new ResponseEntity<>(hotelList, HttpStatus.OK);
 
@@ -75,7 +84,7 @@ public class HotelController {
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Hotel>> findHotelById(@PathVariable UUID id) {
 
-        Optional<Hotel> hotel = this.hr.findById(id);
+        Optional<Hotel> hotel = this.hotelR.findById(id);
 
         return new ResponseEntity<>(hotel, HttpStatus.OK);
 
@@ -85,7 +94,7 @@ public class HotelController {
     public ResponseEntity<String> updateHotel(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
 
         try {
-            this.hs.update(id, fields);
+            this.hotelS.update(id, fields);
             return new ResponseEntity<>("Updated Hotel", HttpStatus.OK);
         } 
         
@@ -99,9 +108,13 @@ public class HotelController {
     public ResponseEntity<String> deleteHotel(@PathVariable UUID id) {
 
         try {
-            this.hs.delete(id);
+            this.hotelS.delete(id);
             return new ResponseEntity<>("Deleted Hotel", HttpStatus.OK);
-        } 
+        }
+        
+        catch (ResponseStatusException e) {
+            return new ResponseEntity<>("Hotel not found.", HttpStatus.NOT_FOUND);
+        }
         
         catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);

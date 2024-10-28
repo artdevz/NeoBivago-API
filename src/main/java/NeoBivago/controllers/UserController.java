@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.user.UserDTO;
 import NeoBivago.entities.User;
@@ -23,6 +24,7 @@ import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.LenghtException;
 import NeoBivago.repositories.UserRepository;
+import NeoBivago.services.MappingService;
 import NeoBivago.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -32,20 +34,23 @@ import jakarta.validation.Valid;
 public class UserController {
 
     @Autowired
-    UserRepository ur;
+    UserRepository userR;
 
     @Autowired
-    UserService us;
+    UserService userS;
+
+    @Autowired
+    MappingService mappingS;
 
     // CRUD:
 
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO data) {
-                
-        User newUser = new User(data.name(), data.email(), data.password(), data.cpf(), data.birthday() );
+        
+        User newUser = new User(data.name(), data.email(), data.password(), data.cpf(), data.birthday(), mappingS.getRole(data.role().getName()) );
 
         try {
-            this.us.create(newUser);
+            this.userS.create(newUser);
             return new ResponseEntity<>("Created User", HttpStatus.CREATED);
         }
 
@@ -71,7 +76,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<User>> readAllUsers() {
 
-        List<User> userList = this.ur.findAll();
+        List<User> userList = this.userR.findAll();
 
         return new ResponseEntity<>(userList, HttpStatus.OK);
 
@@ -80,7 +85,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<Optional<User>> findUserById(@PathVariable UUID id) {
 
-        Optional<User> user = this.ur.findById(id);
+        Optional<User> user = this.userR.findById(id);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
 
@@ -90,7 +95,7 @@ public class UserController {
     public ResponseEntity<String> updateUser(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
 
         try {
-            this.us.update(id, fields);
+            this.userS.update(id, fields);
             return new ResponseEntity<>("Updated User", HttpStatus.OK);
         } 
         
@@ -104,9 +109,13 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
 
         try {
-            this.us.delete(id);
+            this.userS.delete(id);
             return new ResponseEntity<>("Deleted User", HttpStatus.OK);
-        } 
+        }
+        
+        catch (ResponseStatusException e) {
+            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+        }
         
         catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);

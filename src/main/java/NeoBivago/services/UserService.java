@@ -9,7 +9,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +30,14 @@ public class UserService {
     private final int MINIMUM_AGE = 18;
 
     @Autowired
-    UserRepository ur;
+    UserRepository userR;
 
     public void create(User user) throws Exception {
 
-        if (this.ur.findByEmail(user.getEmail()) != null) throw new ExistingAttributeException(
+        if (this.userR.findByEmail(user.getEmail()) != null) throw new ExistingAttributeException(
             "Email is already being used.");
 
-        if (this.ur.findByCpf(user.getCpf()) != null) throw new ExistingAttributeException(
+        if (this.userR.findByCpf(user.getCpf()) != null) throw new ExistingAttributeException(
             "CPF is already being used.");
 
         if ( (user.getName().length() < MIN_LENGHT) || (user.getName().length() > MAX_LENGHT) ) throw new LenghtException(
@@ -49,13 +51,13 @@ public class UserService {
         
 
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        this.ur.save(user);
+        this.userR.save(user);
 
     }
 
     public User update(UUID id, Map<String, Object> fields) {
 
-        Optional<User> existingUser = this.ur.findById(id);
+        Optional<User> existingUser = this.userR.findById(id);
 
         if (existingUser.isPresent()) {
 
@@ -64,7 +66,7 @@ public class UserService {
                 field.setAccessible(true);
                 ReflectionUtils.setField(field, existingUser.get(), value);
             });
-            return ur.save(existingUser.get());
+            return userR.save(existingUser.get());
 
         }
         return null;
@@ -72,7 +74,10 @@ public class UserService {
     }
 
     public void delete(UUID id) {
-        this.ur.deleteById(id);
+
+        if (!userR.findById(id).isPresent()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        this.userR.deleteById(id);
+
     }
 
     private Date minimumDate() {

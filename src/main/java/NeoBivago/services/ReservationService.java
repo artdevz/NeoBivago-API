@@ -1,8 +1,6 @@
 package NeoBivago.services;
 
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +8,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.entities.Reservation;
+import NeoBivago.entities.Room;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.repositories.ReservationRepository;
@@ -22,7 +23,7 @@ import NeoBivago.repositories.ReservationRepository;
 public class ReservationService {
     
     @Autowired
-    ReservationRepository rr;
+    ReservationRepository reservationR;
 
     public void create(Reservation reservation) throws Exception {
 
@@ -33,15 +34,15 @@ public class ReservationService {
         if ( dateConflicts(reservation.getRoom(), reservation.getCheckIn(), reservation.getCheckOut())) throw new ExistingAttributeException(
             "Date Conflicts Detected :( Please, turn your check-in or check-out date.");
 
-        // To Do: Capacity Limit
+        // To Do: Capacity Limit, Reservation in the past.
 
-        this.rr.save(reservation);
+        this.reservationR.save(reservation);
 
     }
 
     public Reservation update(UUID id, Map<String, Object> fields) {
 
-        Optional<Reservation> existingReservation = this.rr.findById(id);
+        Optional<Reservation> existingReservation = this.reservationR.findById(id);
 
         if (existingReservation.isPresent()) {
 
@@ -50,7 +51,7 @@ public class ReservationService {
                 field.setAccessible(true);
                 ReflectionUtils.setField(field, existingReservation.get(), value);
             });
-            return rr.save(existingReservation.get());
+            return reservationR.save(existingReservation.get());
 
         }
         return null;
@@ -58,31 +59,30 @@ public class ReservationService {
     }
 
     public void delete(UUID id) {
-        this.rr.deleteById(id);
+
+        if (!reservationR.findById(id).isPresent()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        this.reservationR.deleteById(id);
+
     }
 
-    public boolean dateConflicts(UUID roomId, Date checkIn, Date checkOut) {
-
-        // Converting Date to LocalDate:
-        LocalDate checkInLD = checkIn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate checkOutLD = checkOut.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    private boolean dateConflicts(Room roomId, Date checkIn, Date checkOut) {
         
-        List<LocalDate> checkInDates = rr.findAllCheckInByRoom(roomId);
+        List<Date> checkInDates = reservationR.findAllCheckInByRoom(roomId.getId());
         
-        List<LocalDate> checkOutDates = rr.findAllCheckOutByRoom(roomId);
-
+        List<Date> checkOutDates = reservationR.findAllCheckOutByRoom(roomId.getId());
+        
         for (int i = 0; i < checkInDates.size(); i++) {
-            LocalDate existingCheckIn = checkInDates.get(i);
-            LocalDate existingCheckOut = checkOutDates.get(i);
+            Date existingCheckIn = checkInDates.get(i);
+            Date existingCheckOut = checkOutDates.get(i);
 
             // Conflict Verify:
-            if ((checkInLD.isBefore(existingCheckOut) && checkOutLD.isAfter(existingCheckIn)) ||
-                (checkInLD.isEqual(existingCheckIn) || checkInLD.isEqual(existingCheckOut)) || 
-                (checkOutLD.isEqual(existingCheckIn) || checkOutLD.isEqual(existingCheckOut))) {
+            if ((checkIn.compareTo(existingCheckOut) < 0 && checkOut.compareTo(existingCheckIn) > 0) ||
+                (checkIn.compareTo(existingCheckIn) == 0 || checkIn.compareTo(existingCheckOut) == 0) || 
+                (checkOut.compareTo(existingCheckIn) == 0 || checkOut.compareTo(existingCheckOut) == 0)) {
                 return true;
             }
         }
-
+        
         return false;
         
     }

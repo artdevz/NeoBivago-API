@@ -14,20 +14,20 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "roles")
-public class ERole {
+@Table(name = "categories")
+public class ERoom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+        @Column(nullable = false, unique = true)
+        private String category;
 
-    private String description;
+        private String description;
 
-    public ERole(String roleName) {
-        this.name = roleName;
-    }
+        public ERoom(String category) {
+            this.category = category;
+        }
 
 }
