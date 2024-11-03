@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.reservation.ReservationDTO;
+import NeoBivago.exceptions.CapacityExceededException;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.models.Reservation;
@@ -114,6 +115,10 @@ public class ReservationController {
         
         catch (ResponseStatusException e) {
             return new ResponseEntity<>("Reservation not found.", HttpStatus.NOT_FOUND);
+        }
+
+        catch (CapacityExceededException e) {
+            return new ResponseEntity<>(e.getMessage() + " Try to book fewer people.", HttpStatus.BAD_REQUEST);
         }
         
         catch (Exception e) {
