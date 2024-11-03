@@ -12,10 +12,10 @@ import NeoBivago.entities.User;
 public class LoginService {
     
     @Autowired
-    LoginRepository lr;
+    LoginRepository loginR;
 
     @Autowired
-    JwtService js;
+    JwtService jwtS;
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -23,8 +23,8 @@ public class LoginService {
     public String signIn(LoginDTO data) {
         
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.email(), data.password()));
-        User user = lr.findByEmail(data.email()).get();        
-        String token = js.generateToken(user);
+        User user = loginR.findByEmail(data.email()).get();        
+        String token = jwtS.generateToken(user);
 
         return token;
 
