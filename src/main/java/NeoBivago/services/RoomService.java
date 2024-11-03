@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.entities.Room;
 import NeoBivago.exceptions.ExistingAttributeException;
+import NeoBivago.models.Room;
 import NeoBivago.repositories.RoomRepository;
 
 @Service

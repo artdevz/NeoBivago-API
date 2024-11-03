@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.user.UserDTO;
-import NeoBivago.entities.User;
 import NeoBivago.exceptions.UnauthorizedDateException;
+import NeoBivago.models.User;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.LenghtException;
 import NeoBivago.repositories.UserRepository;

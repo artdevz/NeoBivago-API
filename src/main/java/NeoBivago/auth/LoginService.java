@@ -6,7 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import NeoBivago.configs.JwtService;
-import NeoBivago.entities.User;
+import NeoBivago.models.User;
 
 @Service
 public class LoginService {

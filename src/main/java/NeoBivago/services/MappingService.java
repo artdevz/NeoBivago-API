@@ -7,12 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.entities.Hotel;
-import NeoBivago.entities.Reservation;
-import NeoBivago.entities.Room;
-import NeoBivago.entities.User;
 import NeoBivago.enums.ERole;
 import NeoBivago.enums.ERoom;
+import NeoBivago.models.Hotel;
+import NeoBivago.models.Reservation;
+import NeoBivago.models.Room;
+import NeoBivago.models.User;
 import NeoBivago.repositories.ERoleRepository;
 import NeoBivago.repositories.ERoomRepository;
 import NeoBivago.repositories.HotelRepository;

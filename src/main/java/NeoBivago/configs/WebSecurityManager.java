@@ -17,7 +17,7 @@ import NeoBivago.repositories.UserRepository;
 public class WebSecurityManager {
     
     @Autowired
-    UserRepository ur;
+    UserRepository userR;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -34,7 +34,7 @@ public class WebSecurityManager {
 
     @Bean
 	public UserDetailsService userDetailsService() {
-		return username -> ur.findByEmail(username);
+		return username -> userR.findByEmail(username);
 				// .orElseThrow(() -> new UsernameNotFoundException("User not found.") );
 	}
 

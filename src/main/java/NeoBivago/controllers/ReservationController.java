@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.reservation.ReservationDTO;
-import NeoBivago.entities.Reservation;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.UnauthorizedDateException;
+import NeoBivago.models.Reservation;
 import NeoBivago.repositories.ReservationRepository;
 import NeoBivago.services.MappingService;
 import NeoBivago.services.ReservationService;

@@ -1,4 +1,4 @@
-package NeoBivago.entities;
+package NeoBivago.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;

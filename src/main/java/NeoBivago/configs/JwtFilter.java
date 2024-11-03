@@ -21,10 +21,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired 
-    JwtService js;
+    JwtService jwtS;
 
     @Autowired
-    UserDetailsService uds;
+    UserDetailsService userDetailsS;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
@@ -40,10 +40,10 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         token = authorizationHeader.replace("Bearer ", "");
-        userEmail = js.extractUsername(token);
-        UserDetails user = this.uds.loadUserByUsername(userEmail);
+        userEmail = jwtS.extractUsername(token);
+        UserDetails user = this.userDetailsS.loadUserByUsername(userEmail);
 
-        if(js.isTokenValid(token, user)) {
+        if(jwtS.isTokenValid(token, user)) {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);  

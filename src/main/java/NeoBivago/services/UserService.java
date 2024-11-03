@@ -16,7 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import NeoBivago.exceptions.UnauthorizedDateException;
-import NeoBivago.entities.User;
+import NeoBivago.models.User;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.LenghtException;
 import NeoBivago.repositories.UserRepository;

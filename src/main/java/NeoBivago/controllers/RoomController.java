@@ -20,8 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.room.RoomDTO;
 import NeoBivago.dto.room.RoomFilterDTO;
-import NeoBivago.entities.Room;
 import NeoBivago.exceptions.ExistingAttributeException;
+import NeoBivago.models.Room;
 import NeoBivago.repositories.RoomRepository;
 import NeoBivago.services.MappingService;
 import NeoBivago.services.RoomService;
