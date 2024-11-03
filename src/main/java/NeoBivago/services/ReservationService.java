@@ -13,10 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.entities.Reservation;
-import NeoBivago.entities.Room;
+import NeoBivago.exceptions.CapacityExceededException;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.UnauthorizedDateException;
+import NeoBivago.models.Reservation;
+import NeoBivago.models.Room;
 import NeoBivago.repositories.ReservationRepository;
 
 @Service
@@ -27,14 +28,17 @@ public class ReservationService {
 
     public void create(Reservation reservation) throws Exception {
 
+        if ( reservation.getCheckOut().before( new Date() )) throw new UnauthorizedDateException(
+            "The Check-In and Check-Out can't be in the Past.");
+
         if ( reservation.getCheckIn().after( reservation.getCheckOut() ) ) throw new UnauthorizedDateException(
-            "The Check-In can't be after the Check-Out.");
-        
+            "The Check-In can't be after the Check-Out.");        
 
         if ( dateConflicts(reservation.getRoom(), reservation.getCheckIn(), reservation.getCheckOut())) throw new ExistingAttributeException(
             "Date Conflicts Detected :( Please, turn your check-in or check-out date.");
-
-        // To Do: Capacity Limit, Reservation in the past.
+        
+        if ( reservation.getNop() > reservation.getRoom().getCapacity() ) throw new CapacityExceededException(
+            "Room capacity has been exceeded.");
 
         this.reservationR.save(reservation);
 

@@ -16,36 +16,23 @@ import jakarta.validation.Valid;
 public class LoginController {
     
     @Autowired
-    LoginService ls;
-
-
-    // @PostMapping("/signup")
-    // public ResponseEntity<Object> signUpAccount(@RequestBody @Valid RegisterDTO data) {
-
-    //     UserModel newUser = new UserModel(data.name(), data.email(), data.password(), data.cpf(), data.birthday() );
-
-    //     try {
-    //         this.us.create(newUser);
-    //         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-    //     } catch (Exception e) {
-    //         return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-    //     }   
-
-    // }
+    LoginService loginS;
 
     @PostMapping("/signin")
     public ResponseEntity<String> signInAccount(@RequestBody @Valid LoginDTO data) {
         
         try {
-            return ResponseEntity.ok(ls.signIn(data));
-        } catch (AuthenticationException e) {
+            return ResponseEntity.ok(loginS.signIn(data));
+        } 
+        
+        catch (AuthenticationException e) {
             return new ResponseEntity<>("Unathorized", HttpStatus.UNAUTHORIZED);
-        } catch (Exception e) {
+        }
+        
+        catch (Exception e) {
             return new ResponseEntity<>("Bad Request", HttpStatus.BAD_REQUEST);
         }
 
     }
-
-    // @PostMapping("/signout")
 
 }
