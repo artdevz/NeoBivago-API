@@ -91,7 +91,7 @@ public class RoomController {
 
         return new ResponseEntity<>(this.roomS.filter(
             this.roomR.roomFilter(
-                data.capacity(), data.price(), 1), data.city()), // Bug at Category Filter.
+                data.capacity(), data.price(), mappingS.getId(data.category().getCategory()).intValue()), data.city()),
             HttpStatus.OK);
 
     }
