@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import NeoBivago.enums.ERoom;
+// import NeoBivago.enums.ERoom;
 import NeoBivago.models.Room;
 
 @Repository
@@ -18,8 +18,8 @@ public interface RoomRepository extends JpaRepository<Room, UUID> {
     @Query(nativeQuery = true, value = "SELECT * FROM rooms WHERE " +
                                        "(:capacity IS NULL OR capacity >= :capacity) AND " +
                                        "(:price IS NULL OR price <= :price) AND " +
-                                       "(:type IS NULL OR type = :type)" 
+                                       "(:category IS NULL OR category_id = :category)" 
     )
-    List<Room> roomFilter(int capacity, int price, ERoom type);
+    List<Room> roomFilter(Integer capacity, Integer price, Integer category);
 
 } 

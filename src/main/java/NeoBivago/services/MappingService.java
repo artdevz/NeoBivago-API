@@ -77,4 +77,14 @@ public class MappingService {
 
     }
 
+    public Long getId(String category) {
+
+        ERoom roomCategory = roomER.findByCategory(category);
+
+        if (roomCategory != null) return roomCategory.getId();
+
+        return null;
+
+    }
+
 }
