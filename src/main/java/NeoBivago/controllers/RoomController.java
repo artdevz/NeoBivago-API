@@ -89,9 +89,10 @@ public class RoomController {
     @GetMapping("/filter")
     public ResponseEntity<List<Room>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
 
-        List<Room> roomList = this.roomR.roomFilter(data.capacity(), data.price(), data.category());
-
-        return new ResponseEntity<>(roomList, HttpStatus.OK);
+        return new ResponseEntity<>(this.roomS.filter(
+            this.roomR.roomFilter(
+                data.capacity(), data.price(), 1), data.city()), // Bug at Category Filter.
+            HttpStatus.OK);
 
     }
 

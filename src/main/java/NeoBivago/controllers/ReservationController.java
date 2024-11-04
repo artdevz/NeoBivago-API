@@ -46,7 +46,6 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<String> createRoom(@RequestBody @Valid ReservationDTO data) {
-
         
         try {
             Reservation newReservation = new Reservation(mappingS.findUserById(data.user()), mappingS.findRoomById(data.room()), data.checkIn(), data.checkOut(), data.nop(), data.price());

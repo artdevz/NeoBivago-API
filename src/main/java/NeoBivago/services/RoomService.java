@@ -1,6 +1,8 @@
 package NeoBivago.services;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +54,16 @@ public class RoomService {
 
         if (!roomR.findById(id).isPresent()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         this.roomR.deleteById(id);
+
+    }
+
+    public List<Room> filter(List<Room> roomList, String city) {
+
+        List<Room> roomCity = new ArrayList<>();
+        
+        for (Room room : roomList) if (room.getHotel().getCity().contains(city)) roomCity.add(room);
+        
+        return roomCity;
 
     }
 
