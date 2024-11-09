@@ -20,8 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.reservation.ReservationDTO;
 import NeoBivago.exceptions.CapacityExceededException;
-import NeoBivago.exceptions.ExistingAttributeException;
-import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.models.Reservation;
 import NeoBivago.repositories.ReservationRepository;
 import NeoBivago.services.MappingService;
@@ -42,32 +40,11 @@ public class ReservationController {
     @Autowired
     MappingService mappingS;
 
-    // CRUD:
-
     @PostMapping
-    public ResponseEntity<String> createRoom(@RequestBody @Valid ReservationDTO data) {
+    public ResponseEntity<String> createRoom(@RequestBody @Valid ReservationDTO data) throws Exception {
         
-        try {
-            Reservation newReservation = new Reservation(mappingS.findUserById(data.user()), mappingS.findRoomById(data.room()), data.checkIn(), data.checkOut(), data.nop(), data.price());
-            this.reservationS.create(newReservation);
-            return new ResponseEntity<>("Created Reservation", HttpStatus.CREATED);
-        }
-
-        catch (ResponseStatusException e) {
-            return new ResponseEntity<>("User or Room not found.", HttpStatus.NOT_FOUND);
-        }
-        
-        catch (UnauthorizedDateException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
-        catch (ExistingAttributeException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        this.reservationS.create(new Reservation(mappingS.findUserById(data.user()), mappingS.findRoomById(data.room()), data.checkIn(), data.checkOut(), data.nop(), data.price()));
+        return new ResponseEntity<>("Created Reservation", HttpStatus.CREATED);
 
     }
 

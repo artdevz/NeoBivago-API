@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.user.UserDTO;
-import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.models.User;
-import NeoBivago.exceptions.ExistingAttributeException;
-import NeoBivago.exceptions.LenghtException;
 import NeoBivago.repositories.UserRepository;
 import NeoBivago.services.MappingService;
 import NeoBivago.services.UserService;
@@ -42,33 +39,11 @@ public class UserController {
     @Autowired
     MappingService mappingS;
 
-    // CRUD:
-
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO data) {
+    public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO data) throws Exception {        
         
-        User newUser = new User(data.name(), data.email(), data.password(), data.cpf(), data.birthday(), mappingS.getRole(data.role().getName()) );
-
-        try {
-            this.userS.create(newUser);
-            return new ResponseEntity<>("Created User", HttpStatus.CREATED);
-        }
-
-        catch (ExistingAttributeException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
-        }
-        
-        catch (LenghtException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
-        catch (UnauthorizedDateException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.FORBIDDEN);
-        } 
-
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }        
+        this.userS.create(new User( data.name(), data.email(), data.password(), data.cpf(), data.birthday(), mappingS.getRole(data.role().getName()) ));
+        return new ResponseEntity<>("Created User", HttpStatus.CREATED);              
 
     }
 

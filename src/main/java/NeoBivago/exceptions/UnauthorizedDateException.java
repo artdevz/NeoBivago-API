@@ -6,6 +6,10 @@ public class UnauthorizedDateException extends RuntimeException {
         super(message);
     }
 
+    public UnauthorizedDateException() {
+        super("UnauthorizedDateException");
+    }
+
     private static final long serialVersionUID = 1L;
 
 }

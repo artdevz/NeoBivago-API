@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.models.User;
 import NeoBivago.exceptions.ExistingAttributeException;
+import NeoBivago.exceptions.InvalidAttributeException;
 import NeoBivago.exceptions.LenghtException;
 import NeoBivago.repositories.UserRepository;
 
@@ -32,23 +33,25 @@ public class UserService {
     @Autowired
     UserRepository userR;
 
-    public void create(User user) throws Exception {
+    public void create(User user) {
 
-        if (this.userR.findByEmail(user.getEmail()) != null) throw new ExistingAttributeException(
-            "Email is already being used.");
+        if (this.userR.findByEmail(user.getEmail()) != null) 
+            throw new ExistingAttributeException("Email is already being used.");
 
-        if (this.userR.findByCpf(user.getCpf()) != null) throw new ExistingAttributeException(
-            "CPF is already being used.");
+        if (this.userR.findByCpf(user.getCpf()) != null) 
+            throw new ExistingAttributeException("CPF is already being used.");
 
-        if ( (user.getName().length() < MIN_LENGHT) || (user.getName().length() > MAX_LENGHT) ) throw new LenghtException(
-            "Username must contain between " + MIN_LENGHT + " and " + MAX_LENGHT + " characters.");
+        if ( (user.getName().length() < MIN_LENGHT) || (user.getName().length() > MAX_LENGHT) ) 
+            throw new LenghtException("Username must contain between " + MIN_LENGHT + " and " + MAX_LENGHT + " characters.");
         
-        if ( (user.getPassword().length() < PASSWORD_MIN_LENGHT) || (user.getPassword().length() > MAX_LENGHT) ) throw new LenghtException(
-            "Password must contain between " + PASSWORD_MIN_LENGHT + " and " + MAX_LENGHT + " characters.");
+        if ( (user.getPassword().length() < PASSWORD_MIN_LENGHT) || (user.getPassword().length() > MAX_LENGHT) ) 
+            throw new LenghtException("Password must contain between " + PASSWORD_MIN_LENGHT + " and " + MAX_LENGHT + " characters.");
 
-        if ( user.getBirthday().after(minimumDate()) ) throw new UnauthorizedDateException(
-            "User must be at least 18 years old.");
+        if ( user.getBirthday().after(minimumDate()) ) 
+            throw new UnauthorizedDateException("User must be at least 18 years old.");
         
+        if ( !isCpfValid(user.getCpf())) 
+            throw new InvalidAttributeException("CPF must be valid.");
 
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         this.userR.save(user);
@@ -75,7 +78,8 @@ public class UserService {
 
     public void delete(UUID id) {
 
-        if (!userR.findById(id).isPresent()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!userR.findById(id).isPresent()) 
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         this.userR.deleteById(id);
 
     }
@@ -87,6 +91,32 @@ public class UserService {
         date = Date.from(ldate.atZone(ZoneId.systemDefault()).toInstant());
         return new java.sql.Date(date.getTime());
 
+    }
+
+    private boolean isCpfValid(String cpf) {        
+        cpf = cpf.replaceAll("\\D", "");
+        
+        if (cpf.length() != 11 || cpf.matches("(\\d)\\1{10}")) return false;
+        
+        try {
+            int tenthDigit = calculateDigit(cpf, 10);
+            int eleventhDigit = calculateDigit(cpf, 11);
+
+            return cpf.charAt(9) == (char) (tenthDigit + '0') && cpf.charAt(10) == (char) (eleventhDigit + '0');
+        } 
+        
+        catch (Exception e) {
+            return false;
+        }
+    }
+
+    private int calculateDigit(String cpf, int weight) {
+        int sum = 0;
+        
+        for (int i = 0; i < weight - 1; i++) sum += (cpf.charAt(i) - '0') * (weight - i);
+        
+        int remainder = 11 - (sum % 11);
+        return (remainder > 9) ? 0 : remainder;
     }
 
 }

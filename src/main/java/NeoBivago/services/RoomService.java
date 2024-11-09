@@ -25,8 +25,8 @@ public class RoomService {
 
     public void create(Room room) throws Exception {
 
-        if (this.roomR.findByNumber(room.getNumber()) != null) throw new ExistingAttributeException(
-            "Room Number is already being used.");
+        if (this.roomR.findByNumber(room.getNumber()) != null) 
+            throw new ExistingAttributeException("Room Number is already being used.");
 
         this.roomR.save(room);
 
@@ -57,7 +57,7 @@ public class RoomService {
 
     }
 
-    public List<Room> filter(List<Room> roomList, String city) {
+    public List<Room> filter(String city, List<Room> roomList) {
 
         List<Room> roomCity = new ArrayList<>();
         

@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.room.RoomDTO;
 import NeoBivago.dto.room.RoomFilterDTO;
-import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.models.Room;
 import NeoBivago.repositories.RoomRepository;
 import NeoBivago.services.MappingService;
@@ -39,34 +38,17 @@ public class RoomController {
     RoomService roomS;
 
     @Autowired
-    MappingService mappingS;
-
-    // CRUD:
+    MappingService mappingS;    
 
     @PostMapping
-    public ResponseEntity<String> createRoom(@RequestBody @Valid RoomDTO data) {
+    public ResponseEntity<String> createRoom(@RequestBody @Valid RoomDTO data) throws Exception {
+       
+        this.roomS.create(new Room(mappingS.findHotelById(data.hotel()), data.number(), data.capacity(), data.price(), mappingS.getCategory(data.category().getCategory())));
+        return new ResponseEntity<>("Created Room", HttpStatus.CREATED);
         
-        
-        try {
-            Room newRoom = new Room(mappingS.findHotelById(data.hotel()), data.number(), data.capacity(), data.price(), mappingS.getCategory(data.category().getCategory()));
-            this.roomS.create(newRoom);
-            return new ResponseEntity<>("Created Room", HttpStatus.CREATED);
-        }
-
-        catch (ResponseStatusException e) {
-            return new ResponseEntity<>("Hotel not found.", HttpStatus.NOT_FOUND);
-        }
-
-        catch (ExistingAttributeException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
     }
 
+    @Operation(summary = "Find All Rooms in NeoBivago", description = "Return a list of all rooms registered in NeoBivago.")
     @GetMapping
     public ResponseEntity<List<Room>> readAllRooms() {
 
@@ -89,9 +71,11 @@ public class RoomController {
     @GetMapping("/filter")
     public ResponseEntity<List<Room>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
 
-        return new ResponseEntity<>(this.roomS.filter(
+        return new ResponseEntity<>(this.roomS.filter(data.city(),
             this.roomR.roomFilter(
-                data.capacity(), data.price(), mappingS.getId(data.category().getCategory()).intValue()), data.city()),
+                data.capacity(), data.price(), mappingS.getId(
+                    data.category().getCategory()).intValue()
+            ) ),
             HttpStatus.OK);
 
     }

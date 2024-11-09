@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import NeoBivago.dto.hotel.HotelDTO;
-import NeoBivago.exceptions.ExistingAttributeException;
-import NeoBivago.exceptions.LenghtException;
 import NeoBivago.models.Hotel;
 import NeoBivago.repositories.HotelRepository;
 import NeoBivago.services.HotelService;
@@ -39,36 +37,14 @@ public class HotelController {
     HotelService hotelS;
 
     @Autowired
-    MappingService mappingS;
-
-    // CRUD:
+    MappingService mappingS;    
 
     @PostMapping
-    public ResponseEntity<String> createHotel(@RequestBody @Valid HotelDTO data) {
-
+    public ResponseEntity<String> createHotel(@RequestBody @Valid HotelDTO data) throws Exception {
+       
+        this.hotelS.create(new Hotel(mappingS.findUserById(data.owner()), data.name(), data.address(), data.city(), data.score()));
+        return new ResponseEntity<>("Created Hotel", HttpStatus.CREATED);
         
-        try {
-            Hotel newHotel = new Hotel(mappingS.findUserById(data.owner()), data.name(), data.address(), data.city(), data.score());
-            this.hotelS.create(newHotel);
-            return new ResponseEntity<>("Created Hotel", HttpStatus.CREATED);
-        }
-
-        catch (ResponseStatusException e) {
-            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
-        }
-        
-        catch (ExistingAttributeException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
-        }
-
-        catch (LenghtException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.FORBIDDEN);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
     }
 
     @Operation(summary = "Find All Hotels in NeoBivago", description = "Return a list of all hotels registered in NeoBivago.")
