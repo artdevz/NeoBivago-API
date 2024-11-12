@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+// import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,8 +49,11 @@ public class WebSecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(request -> request
-
-            .requestMatchers( "/**").permitAll()
+            
+            .requestMatchers("/**").permitAll()
+            // .requestMatchers( HttpMethod.POST, "/user", "/auth/login").permitAll()
+            // .requestMatchers(HttpMethod.GET, "/room/filter").permitAll()
+            // .requestMatchers(HttpMethod.GET, "/user", "/hotel", "/room", "/reservation").hasAuthority("USER")
             .anyRequest().authenticated())
 
         .authenticationProvider(authenticationProvider)

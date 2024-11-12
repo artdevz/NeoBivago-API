@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,7 +40,15 @@ public class UserController {
     @Autowired
     MappingService mappingS;
 
+    @Operation(summary = "Create an User in NeoBivago", 
+        description = "This endpoint allows creating a new user in NeoBivago.\n\n" +
+        "• [201]: If the user is successfully created.\n\n" +
+        "• [400]: If the email or CPF are invalid.\n\n" +
+        "• [403]: If the user is underage.\n\n" +
+        "• [409]: If the email or CPF already be used.\n\n" +
+        "• [422]: If the username or password are not the standard length.\n\n")
     @PostMapping
+    // @PreAuthorize("hasAuthority('USER')")    
     public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO data) throws Exception {        
         
         this.userS.create(new User( data.name(), data.email(), data.password(), data.cpf(), data.birthday(), mappingS.getRole(data.role().getName()) ));
@@ -47,8 +56,9 @@ public class UserController {
 
     }
 
-    @Operation(summary = "Find All Users in NeoBivago", description = "Return a list of all users registered in NeoBivago.")
-    @GetMapping
+    @Operation(summary = "Find All Users in NeoBivago", 
+        description = "Return a list of all users registered in NeoBivago.")
+    @GetMapping    
     public ResponseEntity<List<User>> readAllUsers() {
 
         List<User> userList = this.userR.findAll();

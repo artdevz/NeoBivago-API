@@ -40,8 +40,8 @@ public class ReservationController {
     @Autowired
     MappingService mappingS;
 
-    @PostMapping
-    public ResponseEntity<String> createRoom(@RequestBody @Valid ReservationDTO data) throws Exception {
+    @PostMapping    
+    public ResponseEntity<String> createReservation(@RequestBody @Valid ReservationDTO data) throws Exception {
         
         this.reservationS.create(new Reservation(mappingS.findUserById(data.user()), mappingS.findRoomById(data.room()), data.checkIn(), data.checkOut(), data.nop(), data.price()));
         return new ResponseEntity<>("Created Reservation", HttpStatus.CREATED);
