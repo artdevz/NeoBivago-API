@@ -1,4 +1,4 @@
-package NeoBivago.dto.room;
+package NeoBivago.dto;
 
 import NeoBivago.enums.ERoom;
 

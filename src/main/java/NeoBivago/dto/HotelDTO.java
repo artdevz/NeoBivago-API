@@ -1,4 +1,4 @@
-package NeoBivago.dto.hotel;
+package NeoBivago.dto;
 
 import java.util.UUID;
 

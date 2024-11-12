@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.dto.room.RoomDTO;
-import NeoBivago.dto.room.RoomFilterDTO;
+import NeoBivago.dto.RoomDTO;
+import NeoBivago.dto.RoomFilterDTO;
 import NeoBivago.models.Room;
 import NeoBivago.repositories.RoomRepository;
 import NeoBivago.services.MappingService;

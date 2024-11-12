@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.dto.hotel.HotelDTO;
+import NeoBivago.dto.HotelDTO;
 import NeoBivago.models.Hotel;
 import NeoBivago.repositories.HotelRepository;
 import NeoBivago.services.HotelService;

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.dto.reservation.ReservationDTO;
+import NeoBivago.dto.ReservationDTO;
 import NeoBivago.exceptions.CapacityExceededException;
 import NeoBivago.models.Reservation;
 import NeoBivago.repositories.ReservationRepository;

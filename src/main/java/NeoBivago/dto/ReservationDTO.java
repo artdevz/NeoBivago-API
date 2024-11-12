@@ -1,4 +1,4 @@
-package NeoBivago.dto.reservation;
+package NeoBivago.dto;
 
 import java.util.Date;
 import java.util.UUID;
