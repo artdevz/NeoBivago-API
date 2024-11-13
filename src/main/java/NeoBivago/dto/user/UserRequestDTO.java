@@ -1,4 +1,4 @@
-package NeoBivago.dto;
+package NeoBivago.dto.user;
 
 import java.util.Date;
 

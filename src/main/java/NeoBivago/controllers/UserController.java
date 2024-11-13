@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import NeoBivago.dto.UserRequestDTO;
-import NeoBivago.dto.UserResponseDTO;
+import NeoBivago.dto.user.UserRequestDTO;
+import NeoBivago.dto.user.UserResponseDTO;
 import NeoBivago.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,7 +33,7 @@ public class UserController {
         this.userS = userS;
     }
 
-    @Operation(summary = "Create an User in NeoBivago")
+    @Operation(summary = "Create a new user in NeoBivago")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "User successfully created."),
         @ApiResponse(responseCode = "400", description = "Invalid email or CPF."),
@@ -44,19 +44,20 @@ public class UserController {
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody @Valid UserRequestDTO data) {        
         
-        this.userS.create(data);
+        userS.create(data);
         return new ResponseEntity<>("Created User", HttpStatus.CREATED);              
 
     }
 
     @Operation(summary = "Get a list of all users in NeoBivago")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "List of all users returned successfully.")
+        @ApiResponse(responseCode = "200", description = "List of all users returned successfully."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @GetMapping    
     public ResponseEntity<List<UserResponseDTO>> readAllUsers() {
 
-        return new ResponseEntity<>(this.userS.readAll(), HttpStatus.OK);
+        return new ResponseEntity<>(userS.readAll(), HttpStatus.OK);
 
     }
 
@@ -83,7 +84,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateUser(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
         
-        this.userS.update(id, fields);
+        userS.update(id, fields);
         return new ResponseEntity<>("Updated User", HttpStatus.OK);
         
     }
@@ -96,7 +97,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
         
-        this.userS.delete(id);
+        userS.delete(id);
         return new ResponseEntity<>("Deleted User", HttpStatus.OK);
            
     }

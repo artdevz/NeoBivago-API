@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 
 import NeoBivago.exceptions.UnauthorizedDateException;
 import NeoBivago.models.User;
-import NeoBivago.dto.UserRequestDTO;
-import NeoBivago.dto.UserResponseDTO;
+import NeoBivago.dto.user.UserRequestDTO;
+import NeoBivago.dto.user.UserResponseDTO;
 import NeoBivago.exceptions.ExistingAttributeException;
 import NeoBivago.exceptions.InvalidAttributeException;
 import NeoBivago.exceptions.LenghtException;
@@ -30,13 +30,12 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     
-    private final int MIN_LENGHT = 3;
-    private final int MAX_LENGHT = 32;
-    private final int PASSWORD_MIN_LENGHT = 8;
+    private final int MIN_LENGTH = 3;
+    private final int MAX_LENGTH = 32;
+    private final int PASSWORD_MIN_LENGTH = 8;
     private final int MINIMUM_AGE = 18;
-
-    private final UserRepository userR;
     
+    private final UserRepository userR;    
     private final MappingService mappingS;
 
     public UserService(UserRepository userR, MappingService mappingS) {
@@ -61,13 +60,13 @@ public class UserService {
             mappingS.getRole(data.role().getName())
         );
         
-        this.userR.save(user);
+        userR.save(user);
 
     }
 
     public List<UserResponseDTO> readAll() {
 
-        return this.userR.findAll().stream()
+        return userR.findAll().stream()
             .map(user -> new UserResponseDTO(
                 user.getId(),
                 user.getName(),
@@ -77,10 +76,10 @@ public class UserService {
                 user.getRole()
             ))
             .collect(Collectors.toList());
-
     }
 
     public UserResponseDTO readById(UUID id) {
+
         User user = userR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         
@@ -96,27 +95,31 @@ public class UserService {
 
     public User update(UUID id, Map<String, Object> fields) {
 
-        Optional<User> existingUser = this.userR.findById(id);
+        Optional<User> existingUser = userR.findById(id);
     
         if (existingUser.isPresent()) {
             User user = existingUser.get();
     
             fields.forEach((key, value) -> {
                 switch (key) {
+
                     case "name":
                         String name = (String) value;
                         validateName(name);
                         user.setName(name);
                         break;
+
                     case "password":
                         String password = (String) value;
                         validatePassword(password);
                         user.setPassword(passwordEncoder.encode(password));
-                        break;            
+                        break;  
+
                     case "role":
                         String roleName = (String) value;
                         user.setRole(mappingS.getRole(roleName));
                         break;
+
                     default:
                         Field field = ReflectionUtils.findField(User.class, key);
                         if (field != null) {
@@ -138,13 +141,13 @@ public class UserService {
 
         if (!userR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        this.userR.deleteById(id);
+        userR.deleteById(id);
 
     }
 
     private void validateEmail(String email) {
 
-        if (this.userR.findByEmail(email) != null) 
+        if (userR.findByEmail(email) != null) 
             throw new ExistingAttributeException("Email is already being used.");
 
     }
@@ -154,7 +157,7 @@ public class UserService {
         if (!validateCpfFormat(cpf))
             throw new InvalidAttributeException("Invalid CPF format.");
 
-        if (this.userR.findByCpf(cpf) != null) 
+        if (userR.findByCpf(cpf) != null) 
             throw new ExistingAttributeException("CPF is already being used.");
 
     }
@@ -203,15 +206,15 @@ public class UserService {
 
     private void validateName(String name) {
 
-        if ( (name.length() < MIN_LENGHT) || (name.length() > MAX_LENGHT) ) 
-            throw new LenghtException("Username must contain between " + MIN_LENGHT + " and " + MAX_LENGHT + " characters.");
+        if ( (name.length() < MIN_LENGTH) || (name.length() > MAX_LENGTH) ) 
+            throw new LenghtException("Username must contain between " + MIN_LENGTH + " and " + MAX_LENGTH + " characters.");
 
     }
 
     private void validatePassword(String password) {
 
-        if ( (password.length() < PASSWORD_MIN_LENGHT) || (password.length() > MAX_LENGHT) ) 
-            throw new LenghtException("Password must contain between " + PASSWORD_MIN_LENGHT + " and " + MAX_LENGHT + " characters.");
+        if ( (password.length() < PASSWORD_MIN_LENGTH) || (password.length() > MAX_LENGTH) ) 
+            throw new LenghtException("Password must contain between " + PASSWORD_MIN_LENGTH + " and " + MAX_LENGTH + " characters.");
 
     }    
 
