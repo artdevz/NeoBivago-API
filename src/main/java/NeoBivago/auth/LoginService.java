@@ -20,7 +20,7 @@ public class LoginService {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    public String signIn(LoginDTO data) {
+    public String login(LoginDTO data) {
         
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.email(), data.password()));
         User user = loginR.findByEmail(data.email()).get();        

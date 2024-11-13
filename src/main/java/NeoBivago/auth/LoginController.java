@@ -18,11 +18,11 @@ public class LoginController {
     @Autowired
     LoginService loginS;
 
-    @PostMapping("/signin")
-    public ResponseEntity<String> signInAccount(@RequestBody @Valid LoginDTO data) {
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody @Valid LoginDTO data) {
         
         try {
-            return ResponseEntity.ok(loginS.signIn(data));
+            return ResponseEntity.ok(loginS.login(data));
         } 
         
         catch (AuthenticationException e) {

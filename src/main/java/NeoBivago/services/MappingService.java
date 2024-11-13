@@ -43,25 +43,25 @@ public class MappingService {
     
     public User findUserById(UUID id) {
 
-        return userR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return userR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User"));
 
     }
 
     public Hotel findHotelById(UUID id) {
 
-        return hotelR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return hotelR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Hotel"));
 
     }
 
     public Room findRoomById(UUID id) {
 
-        return roomR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return roomR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room"));
 
     }
 
     public Reservation findReservationById(UUID id) {
 
-        return reservationR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return reservationR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation"));
 
     }
 

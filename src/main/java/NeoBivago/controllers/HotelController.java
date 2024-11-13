@@ -16,16 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.dto.hotel.HotelDTO;
-import NeoBivago.exceptions.ExistingAttributeException;
-import NeoBivago.exceptions.LenghtException;
+import NeoBivago.dto.hotel.HotelRequestDTO;
 import NeoBivago.models.Hotel;
 import NeoBivago.repositories.HotelRepository;
 import NeoBivago.services.HotelService;
 import NeoBivago.services.MappingService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 
 @RequestMapping("/hotel")
@@ -35,43 +33,40 @@ public class HotelController {
     @Autowired
     HotelRepository hotelR;
 
-    @Autowired
-    HotelService hotelS;
+    private final HotelService hotelS;
 
     @Autowired
-    MappingService mappingS;
+    MappingService mappingS;    
 
-    // CRUD:
-
-    @PostMapping
-    public ResponseEntity<String> createHotel(@RequestBody @Valid HotelDTO data) {
-
-        
-        try {
-            Hotel newHotel = new Hotel(mappingS.findUserById(data.owner()), data.name(), data.address(), data.city(), data.score());
-            this.hotelS.create(newHotel);
-            return new ResponseEntity<>("Created Hotel", HttpStatus.CREATED);
-        }
-
-        catch (ResponseStatusException e) {
-            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
-        }
-        
-        catch (ExistingAttributeException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
-        }
-
-        catch (LenghtException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.FORBIDDEN);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
+    public HotelController(HotelService hotelS) {
+        this.hotelS = hotelS;
     }
 
-    @Operation(summary = "Find All Hotels in NeoBivago", description = "Return a list of all hotels registered in NeoBivago.")
+    @Operation(
+        summary = "Create a new hotel",
+        description = "Create a new hotel in the NeoBivago system.",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Hotel created successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid hotel data."),
+            @ApiResponse(responseCode = "409", description = "Hotel with the same name already exists.")
+        }
+    )
+    @PostMapping
+    public ResponseEntity<String> createHotel(@RequestBody @Valid HotelRequestDTO data) throws Exception {
+       
+        this.hotelS.create(data);
+        return new ResponseEntity<>("Created Hotel", HttpStatus.CREATED);
+        
+    }
+
+    @Operation(
+        summary = "Get all hotels",
+        description = "Retrieve a list of all hotels registered in the NeoBivago system.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "List of all hotels retrieved successfully."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")
+        }
+    )    
     @GetMapping
     public ResponseEntity<List<Hotel>> readAllHotels() {
 
@@ -81,6 +76,14 @@ public class HotelController {
 
     }
 
+    @Operation(
+        summary = "Get a hotel by ID",
+        description = "Retrieve details of a specific hotel by its ID.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Hotel found."),
+            @ApiResponse(responseCode = "404", description = "Hotel not found.")
+        }
+    )
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Hotel>> findHotelById(@PathVariable UUID id) {
 
@@ -90,35 +93,36 @@ public class HotelController {
 
     }
 
+    @Operation(
+        summary = "Update a hotel",
+        description = "Update information of an existing hotel by providing its ID and the fields to update.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Hotel updated successfully."),
+            @ApiResponse(responseCode = "404", description = "Hotel not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid fields or data.")
+        }
+    )
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateHotel(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
 
-        try {
-            this.hotelS.update(id, fields);
-            return new ResponseEntity<>("Updated Hotel", HttpStatus.OK);
-        } 
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        this.hotelS.update(id, fields);
+        return new ResponseEntity<>("Updated Hotel", HttpStatus.OK);
 
     }
 
+    @Operation(
+        summary = "Delete a hotel",
+        description = "Delete a hotel from the NeoBivago system by providing its ID.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Hotel deleted successfully."),
+            @ApiResponse(responseCode = "404", description = "Hotel not found.")
+        }
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHotel(@PathVariable UUID id) {
-
-        try {
-            this.hotelS.delete(id);
-            return new ResponseEntity<>("Deleted Hotel", HttpStatus.OK);
-        }
         
-        catch (ResponseStatusException e) {
-            return new ResponseEntity<>("Hotel not found.", HttpStatus.NOT_FOUND);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        this.hotelS.delete(id);
+        return new ResponseEntity<>("Deleted Hotel", HttpStatus.OK);
 
     }
 

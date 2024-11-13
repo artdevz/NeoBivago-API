@@ -6,6 +6,10 @@ public class ExistingAttributeException extends RuntimeException {
         super(message);
     }
 
+    public ExistingAttributeException() {
+        super("ExistingAttributeException.");
+    }
+
     private static final long serialVersionUID = 1L;
 
 }

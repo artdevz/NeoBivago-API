@@ -6,6 +6,10 @@ public class LenghtException extends RuntimeException {
         super(message);
     }
 
+    public LenghtException() {
+        super("LenghtException");
+    }
+
     private static final long serialVersionUID = 1L;
 
 }

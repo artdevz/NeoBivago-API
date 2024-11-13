@@ -2,10 +2,8 @@ package NeoBivago.controllers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,115 +14,123 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.dto.room.RoomDTO;
-import NeoBivago.dto.room.RoomFilterDTO;
-import NeoBivago.exceptions.ExistingAttributeException;
-import NeoBivago.models.Room;
-import NeoBivago.repositories.RoomRepository;
-import NeoBivago.services.MappingService;
+import NeoBivago.dto.room.RoomRequestDTO;
+import NeoBivago.dto.room.RoomResponseDTO;
+// import NeoBivago.dto.RoomFilterDTO;
+// import NeoBivago.services.MappingService;
 import NeoBivago.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 
 @RequestMapping("/room")
 @RestController
-public class RoomController {
+public class RoomController {   
     
-    @Autowired
-    RoomRepository roomR;
+    private final RoomService roomS;   
 
-    @Autowired
-    RoomService roomS;
+    public RoomController(RoomService roomS) {
+        this.roomS = roomS;        
+    }
 
-    @Autowired
-    MappingService mappingS;
-
-    // CRUD:
-
+    @Operation(
+        summary = "Create a new room",
+        description = "Create a new room in the NeoBivago system.",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Room created successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid room data."),
+            @ApiResponse(responseCode = "409", description = "Room with the same name or attributes already exists.")
+        }
+    )
     @PostMapping
-    public ResponseEntity<String> createRoom(@RequestBody @Valid RoomDTO data) {
+    public ResponseEntity<String> createRoom(@RequestBody @Valid RoomRequestDTO data) throws Exception {
+       
+        roomS.create(data);
+        return new ResponseEntity<>("Created Room", HttpStatus.CREATED);
         
-        
-        try {
-            Room newRoom = new Room(mappingS.findHotelById(data.hotel()), data.number(), data.capacity(), data.price(), mappingS.getCategory(data.category().getCategory()));
-            this.roomS.create(newRoom);
-            return new ResponseEntity<>("Created Room", HttpStatus.CREATED);
-        }
-
-        catch (ResponseStatusException e) {
-            return new ResponseEntity<>("Hotel not found.", HttpStatus.NOT_FOUND);
-        }
-
-        catch (ExistingAttributeException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
     }
 
+    @Operation(
+        summary = "Get all rooms",
+        description = "Retrieve a list of all rooms registered in the NeoBivago system.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "List of all rooms retrieved successfully."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")
+        }
+    )
     @GetMapping
-    public ResponseEntity<List<Room>> readAllRooms() {
+    public ResponseEntity<List<RoomResponseDTO>> readAllRooms() {        
 
-        List<Room> roomList = this.roomR.findAll();
-
-        return new ResponseEntity<>(roomList, HttpStatus.OK);
+        return new ResponseEntity<>(roomS.readAll(), HttpStatus.OK);
 
     }
 
+    @Operation(
+        summary = "Get a room by ID",
+        description = "Retrieve details of a specific room by its ID.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Room found."),
+            @ApiResponse(responseCode = "404", description = "Room not found.")
+        }
+    )
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Room>> findRoomById(@PathVariable UUID id) {
+    public ResponseEntity<RoomResponseDTO> findRoomById(@PathVariable UUID id) {
 
-        Optional<Room> room = this.roomR.findById(id);
-
-        return new ResponseEntity<>(room, HttpStatus.OK);
-
-    }
-    
-    @Operation(summary = "Find All Rooms in NeoBivago", description = "Return a list of all rooms registered in NeoBivago.")
-    @GetMapping("/filter")
-    public ResponseEntity<List<Room>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
-
-        return new ResponseEntity<>(this.roomS.filter(
-            this.roomR.roomFilter(
-                data.capacity(), data.price(), mappingS.getId(data.category().getCategory()).intValue()), data.city()),
-            HttpStatus.OK);
+        return new ResponseEntity<>(roomS.readById(id), HttpStatus.OK);
 
     }
 
+    // @Operation(
+    //     summary = "Filter rooms",
+    //     description = "Return a list of rooms filtered by certain criteria.",
+    //     responses = {
+    //         @ApiResponse(responseCode = "200", description = "Rooms found based on filter criteria."),
+    //         @ApiResponse(responseCode = "400", description = "Invalid filter data.")
+    //     }
+    // )
+    // @GetMapping("/filter")
+    // public ResponseEntity<List<Room>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
+
+    //     return new ResponseEntity<>(this.roomS.filter(data.city(),
+    //         this.roomR.roomFilter(
+    //             data.capacity(), data.price(), mappingS.getId(
+    //                 data.category().getCategory()).intValue()
+    //         ) ),
+    //         HttpStatus.OK);
+
+    // }
+
+    @Operation(
+        summary = "Update room details",
+        description = "Update room details by providing its ID and the fields to update.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Room updated successfully."),
+            @ApiResponse(responseCode = "404", description = "Room not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid fields or data.")
+        }
+    )
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateRoom(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-
-        try {
-            this.roomS.update(id, fields);
-            return new ResponseEntity<>("Updated Room", HttpStatus.OK);
-        } 
         
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
+        this.roomS.update(id, fields);
+        return new ResponseEntity<>("Updated Room", HttpStatus.OK);
+        
     }
 
+    @Operation(
+        summary = "Delete a room",
+        description = "Delete a room from the NeoBivago system by providing its ID.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Room deleted successfully."),
+            @ApiResponse(responseCode = "404", description = "Room not found.")
+        }
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRoom(@PathVariable UUID id) {
-
-        try {
-            this.roomS.delete(id);
-            return new ResponseEntity<>("Deleted Room", HttpStatus.OK);
-        }
         
-        catch (ResponseStatusException e) {
-            return new ResponseEntity<>("Room not found.", HttpStatus.NOT_FOUND);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        this.roomS.delete(id);
+        return new ResponseEntity<>("Deleted Room", HttpStatus.OK);
 
     }
 

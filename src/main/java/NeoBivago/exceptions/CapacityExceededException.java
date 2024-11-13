@@ -6,6 +6,10 @@ public class CapacityExceededException extends RuntimeException {
         super(message);
     }
 
+    public CapacityExceededException() {
+        super("CapacityExceededException.");
+    }
+
     private static final long serialVersionUID = 1L;
 
 }

@@ -2,10 +2,8 @@ package NeoBivago.controllers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,111 +14,92 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import NeoBivago.dto.user.UserDTO;
-import NeoBivago.exceptions.UnauthorizedDateException;
-import NeoBivago.models.User;
-import NeoBivago.exceptions.ExistingAttributeException;
-import NeoBivago.exceptions.LenghtException;
-import NeoBivago.repositories.UserRepository;
-import NeoBivago.services.MappingService;
+import NeoBivago.dto.user.UserRequestDTO;
+import NeoBivago.dto.user.UserResponseDTO;
 import NeoBivago.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RequestMapping("/user")
 @RestController
 public class UserController {
 
-    @Autowired
-    UserRepository userR;
+    private final UserService userS;    
 
-    @Autowired
-    UserService userS;
+    public UserController(UserService userS) {        
+        this.userS = userS;
+    }
 
-    @Autowired
-    MappingService mappingS;
-
-    // CRUD:
-
+    @Operation(summary = "Create a new user in NeoBivago")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "User successfully created."),
+        @ApiResponse(responseCode = "400", description = "Invalid email or CPF."),
+        @ApiResponse(responseCode = "403", description = "User is underage."),
+        @ApiResponse(responseCode = "409", description = "Email or CPF already in use."),
+        @ApiResponse(responseCode = "422", description = "Username or password length is invalid.")
+    })
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO data) {
+    public ResponseEntity<String> createUser(@RequestBody @Valid UserRequestDTO data) {        
         
-        User newUser = new User(data.name(), data.email(), data.password(), data.cpf(), data.birthday(), mappingS.getRole(data.role().getName()) );
-
-        try {
-            this.userS.create(newUser);
-            return new ResponseEntity<>("Created User", HttpStatus.CREATED);
-        }
-
-        catch (ExistingAttributeException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.CONFLICT);
-        }
-        
-        catch (LenghtException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
-        catch (UnauthorizedDateException e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.FORBIDDEN);
-        } 
-
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }        
+        userS.create(data);
+        return new ResponseEntity<>("Created User", HttpStatus.CREATED);              
 
     }
 
-    @Operation(summary = "Find All Users in NeoBivago", description = "Return a list of all users registered in NeoBivago.")
-    @GetMapping
-    public ResponseEntity<List<User>> readAllUsers() {
+    @Operation(summary = "Get a list of all users in NeoBivago")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "List of all users returned successfully."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
+    @GetMapping    
+    public ResponseEntity<List<UserResponseDTO>> readAllUsers() {
 
-        List<User> userList = this.userR.findAll();
-
-        return new ResponseEntity<>(userList, HttpStatus.OK);
+        return new ResponseEntity<>(userS.readAll(), HttpStatus.OK);
 
     }
 
+    @Operation(summary = "Find a user by ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User found and returned successfully."),
+        @ApiResponse(responseCode = "404", description = "User not found.")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<User>> findUserById(@PathVariable UUID id) {
+    public ResponseEntity<UserResponseDTO> findUserById(@PathVariable UUID id) {
 
-        Optional<User> user = this.userR.findById(id);
+        UserResponseDTO user = userS.readById(id);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
 
     }
     
+    @Operation(summary = "Update fields of an existing user by ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User updated successfully."),
+        @ApiResponse(responseCode = "400", description = "Invalid field value provided."),
+        @ApiResponse(responseCode = "404", description = "User not found.")
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateUser(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-
-        try {
-            this.userS.update(id, fields);
-            return new ResponseEntity<>("Updated User", HttpStatus.OK);
-        } 
         
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
+        userS.update(id, fields);
+        return new ResponseEntity<>("Updated User", HttpStatus.OK);
+        
     }
 
+    @Operation(summary = "Delete a user by ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User deleted successfully."),
+        @ApiResponse(responseCode = "404", description = "User not found.")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
-
-        try {
-            this.userS.delete(id);
-            return new ResponseEntity<>("Deleted User", HttpStatus.OK);
-        }
         
-        catch (ResponseStatusException e) {
-            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
+        userS.delete(id);
+        return new ResponseEntity<>("Deleted User", HttpStatus.OK);
+           
     }
 
 }
