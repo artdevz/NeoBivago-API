@@ -55,7 +55,7 @@ public class HotelService {
         return hotelR.findAll().stream()
             .map(hotel -> new HotelResponseDTO(
                 hotel.getId(),
-                hotel.getOwner(),
+                hotel.getOwner().getId(),
                 hotel.getName(),
                 hotel.getAddress(),
                 hotel.getCity(),
@@ -71,7 +71,7 @@ public class HotelService {
 
         return new HotelResponseDTO(
             hotel.getId(),
-            hotel.getOwner(),
+            hotel.getOwner().getId(),
             hotel.getName(),
             hotel.getAddress(),
             hotel.getCity(),

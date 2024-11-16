@@ -2,10 +2,8 @@ package NeoBivago.controllers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import NeoBivago.dto.hotel.HotelRequestDTO;
-import NeoBivago.models.Hotel;
-import NeoBivago.repositories.HotelRepository;
+import NeoBivago.dto.hotel.HotelResponseDTO;
 import NeoBivago.services.HotelService;
-import NeoBivago.services.MappingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -30,13 +26,7 @@ import jakarta.validation.Valid;
 @RestController
 public class HotelController {
     
-    @Autowired
-    HotelRepository hotelR;
-
     private final HotelService hotelS;
-
-    @Autowired
-    MappingService mappingS;    
 
     public HotelController(HotelService hotelS) {
         this.hotelS = hotelS;
@@ -68,11 +58,9 @@ public class HotelController {
         }
     )    
     @GetMapping
-    public ResponseEntity<List<Hotel>> readAllHotels() {
+    public ResponseEntity<List<HotelResponseDTO>> readAllHotels() {
 
-        List<Hotel> hotelList = this.hotelR.findAll();
-
-        return new ResponseEntity<>(hotelList, HttpStatus.OK);
+        return new ResponseEntity<>(this.hotelS.readAll(), HttpStatus.OK);
 
     }
 
@@ -85,11 +73,9 @@ public class HotelController {
         }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Hotel>> findHotelById(@PathVariable UUID id) {
+    public ResponseEntity<HotelResponseDTO> findHotelById(@PathVariable UUID id) {
 
-        Optional<Hotel> hotel = this.hotelR.findById(id);
-
-        return new ResponseEntity<>(hotel, HttpStatus.OK);
+        return new ResponseEntity<>(hotelS.readById(id), HttpStatus.OK);
 
     }
 

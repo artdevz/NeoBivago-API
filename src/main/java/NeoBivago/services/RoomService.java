@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import NeoBivago.dto.room.FilterRequestDTO;
+import NeoBivago.dto.room.FilterResponseDTO;
 import NeoBivago.dto.room.RoomRequestDTO;
 import NeoBivago.dto.room.RoomResponseDTO;
 import NeoBivago.exceptions.ExistingAttributeException;
@@ -53,7 +55,7 @@ public class RoomService {
         return roomR.findAll().stream()
             .map(room -> new RoomResponseDTO(
                 room.getId(),
-                room.getHotel(),
+                room.getHotel().getId(),
                 room.getNumber(),
                 room.getCapacity(),
                 room.getPrice(),
@@ -69,7 +71,7 @@ public class RoomService {
 
         return new RoomResponseDTO(
             room.getId(),
-            room.getHotel(),
+            room.getHotel().getId(),
             room.getNumber(),
             room.getCapacity(),
             room.getPrice(),
@@ -117,13 +119,30 @@ public class RoomService {
 
     }
 
-    public List<Room> filter(String city, List<Room> roomList) {
+    public List<FilterResponseDTO> filter(FilterRequestDTO data) {
+        
+        List<FilterResponseDTO> roomCity = new ArrayList<>();
 
-        List<Room> roomCity = new ArrayList<>();
+        List<Room> roomList = roomR.roomFilter(
+            data.capacity(), data.price(), 
+                mappingS.getId(
+                    data.category().getCategory()).intValue());
         
-        for (Room room : roomList) if (room.getHotel().getCity().contains(city)) roomCity.add(room);
-        
-        return roomCity;
+        for (Room room : roomList) {
+            if (room.getHotel().getCity().contains(data.city())) {
+
+                roomCity.add(
+                    new FilterResponseDTO(
+                        room.getHotel().getId(), 
+                        room.getCapacity(),
+                        room.getPrice(),
+                        room.getCategory(),
+                        room.getHotel().getCity())
+                );
+            }
+        }        
+
+        return roomCity.stream().collect(Collectors.toList());        
 
     }
 

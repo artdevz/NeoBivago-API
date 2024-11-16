@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import NeoBivago.dto.room.RoomRequestDTO;
 import NeoBivago.dto.room.RoomResponseDTO;
-// import NeoBivago.dto.RoomFilterDTO;
-// import NeoBivago.services.MappingService;
+import NeoBivago.dto.room.FilterRequestDTO;
+import NeoBivago.dto.room.FilterResponseDTO;
 import NeoBivago.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -81,25 +81,20 @@ public class RoomController {
 
     }
 
-    // @Operation(
-    //     summary = "Filter rooms",
-    //     description = "Return a list of rooms filtered by certain criteria.",
-    //     responses = {
-    //         @ApiResponse(responseCode = "200", description = "Rooms found based on filter criteria."),
-    //         @ApiResponse(responseCode = "400", description = "Invalid filter data.")
-    //     }
-    // )
-    // @GetMapping("/filter")
-    // public ResponseEntity<List<Room>> readAllRoomsWithFilter(@RequestBody @Valid RoomFilterDTO data) {
+    @Operation(
+        summary = "Filter rooms",
+        description = "Return a list of rooms filtered by certain criteria.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Rooms found based on filter criteria."),
+            @ApiResponse(responseCode = "400", description = "Invalid filter data.")
+        }
+    )
+    @GetMapping("/filter")
+    public ResponseEntity<List<FilterResponseDTO>> readRoomFilter(@RequestBody @Valid FilterRequestDTO data) {
+   
+        return new ResponseEntity<>(roomS.filter(data), HttpStatus.OK);
 
-    //     return new ResponseEntity<>(this.roomS.filter(data.city(),
-    //         this.roomR.roomFilter(
-    //             data.capacity(), data.price(), mappingS.getId(
-    //                 data.category().getCategory()).intValue()
-    //         ) ),
-    //         HttpStatus.OK);
-
-    // }
+    }
 
     @Operation(
         summary = "Update room details",

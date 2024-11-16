@@ -56,8 +56,8 @@ public class ReservationService {
         return reservationR.findAll().stream()
             .map(reservation -> new ReservationResponseDTO(
                 reservation.getId(),
-                reservation.getUser(),
-                reservation.getRoom(),
+                reservation.getUser().getId(),
+                reservation.getRoom().getId(),
                 reservation.getCheckIn(),
                 reservation.getCheckOut(),
                 reservation.getNop(),
@@ -73,8 +73,8 @@ public class ReservationService {
 
         return new ReservationResponseDTO(
             reservation.getId(),
-            reservation.getUser(),
-            reservation.getRoom(),
+            reservation.getUser().getId(),
+            reservation.getRoom().getId(),
             reservation.getCheckIn(),
             reservation.getCheckOut(),
             reservation.getNop(),
