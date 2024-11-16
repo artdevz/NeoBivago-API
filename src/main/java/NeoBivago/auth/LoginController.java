@@ -1,9 +1,7 @@
 package NeoBivago.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,23 +13,16 @@ import jakarta.validation.Valid;
 @RestController
 public class LoginController {
     
-    @Autowired
-    LoginService loginS;
+    final LoginService loginS;
+
+    public LoginController(LoginService loginS) {
+        this.loginS = loginS;
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginDTO data) {
+    public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDTO data) {
         
-        try {
-            return ResponseEntity.ok(loginS.login(data));
-        } 
-        
-        catch (AuthenticationException e) {
-            return new ResponseEntity<>("Unathorized", HttpStatus.UNAUTHORIZED);
-        }
-        
-        catch (Exception e) {
-            return new ResponseEntity<>("Bad Request", HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(loginS.login(data), HttpStatus.OK);
 
     }
 

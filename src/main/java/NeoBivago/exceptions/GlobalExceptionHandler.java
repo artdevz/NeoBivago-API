@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,6 +36,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleValidationExceptions(MethodArgumentNotValidException e) {
         ApiErrorResponse response = new ApiErrorResponse("BAD_REQUEST", "Validation failed: " + e.getMessage(), "VALIDATION_ERROR");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    // Invalid Credentials
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    public ResponseEntity<ApiErrorResponse> handleAuthenticationException(AuthenticationException e) {
+        ApiErrorResponse response = new ApiErrorResponse("UNAUTHORIZED", "Invalid Credentials", "AUTHENTICATION_ERROR");
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     // Conflict

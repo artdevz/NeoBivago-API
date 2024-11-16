@@ -11,6 +11,6 @@ import NeoBivago.models.User;
 @Repository
 public interface LoginRepository extends JpaRepository<User, UUID> {
     
-    public Optional<User> findByEmail(String login);
+    Optional<User> findByEmail(String login);
 
 }

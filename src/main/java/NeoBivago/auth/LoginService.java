@@ -1,6 +1,5 @@
 package NeoBivago.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -11,23 +10,25 @@ import NeoBivago.models.User;
 @Service
 public class LoginService {
     
-    @Autowired
-    LoginRepository loginR;
+    final LoginRepository loginR;
 
-    @Autowired
-    JwtService jwtS;
+    final JwtService jwtS;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+    final AuthenticationManager authenticationManager;
 
-    public String login(LoginDTO data) {
+    public LoginService(LoginRepository loginR, JwtService jwtS, AuthenticationManager authenticationManager) {
+        this.loginR = loginR;
+        this.jwtS = jwtS;
+        this.authenticationManager = authenticationManager;
+    }
+
+    public String login(LoginRequestDTO data) {
         
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(data.email(), data.password()));
-        User user = loginR.findByEmail(data.email()).get();        
-        String token = jwtS.generateToken(user);
-
-        return token;
-
+                
+        User user = loginR.findByEmail(data.email()).get();                    
+        return jwtS.generateToken(user);
+        
     }
 
 }
