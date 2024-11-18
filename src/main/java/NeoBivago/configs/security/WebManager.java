@@ -1,6 +1,5 @@
-package NeoBivago.configs;
+package NeoBivago.configs.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,10 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import NeoBivago.repositories.UserRepository;
 
 @Configuration
-public class WebSecurityManager {
+public class WebManager {
     
-    @Autowired
-    UserRepository userR;
+    private final UserRepository userR;
+
+    public WebManager(UserRepository userR) {
+        this.userR = userR;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {

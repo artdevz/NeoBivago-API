@@ -27,7 +27,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,8 +51,7 @@ public class User implements UserDetails {
     @Column(name = "name")
     private String name;
 
-    @NotBlank(message = "Email is required.")
-    @Email(message = "Invalid Email format.")
+    @Email
     @Column(name = "email")
     private String email;
 

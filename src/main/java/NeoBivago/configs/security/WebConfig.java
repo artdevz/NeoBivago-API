@@ -1,8 +1,7 @@
-package NeoBivago.configs;
+package NeoBivago.configs.security;
 
 import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 // import org.springframework.http.HttpMethod;
@@ -16,15 +15,20 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import NeoBivago.configs.jwt.JwtFilter;
+
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig {
+public class WebConfig {
     
-    @Autowired
-    JwtFilter jf;
+    private final JwtFilter jwtF;
 
-    @Autowired
-    AuthenticationProvider authenticationProvider;    
+    private final AuthenticationProvider authProvider;
+    
+    public WebConfig(JwtFilter jwtF, AuthenticationProvider authProvider) {
+        this.jwtF = jwtF;
+        this.authProvider = authProvider;
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -56,8 +60,8 @@ public class WebSecurityConfig {
             // .requestMatchers(HttpMethod.GET, "/user", "/hotel", "/room", "/reservation").hasAuthority("USER")
             .anyRequest().authenticated())
 
-        .authenticationProvider(authenticationProvider)
-        .addFilterBefore(jf, UsernamePasswordAuthenticationFilter.class);        
+        .authenticationProvider(authProvider)
+        .addFilterBefore(jwtF, UsernamePasswordAuthenticationFilter.class);        
 
         return http.build();
 

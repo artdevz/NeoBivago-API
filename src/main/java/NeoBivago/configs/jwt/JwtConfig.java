@@ -1,4 +1,4 @@
-package NeoBivago.configs;
+package NeoBivago.configs.jwt;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 

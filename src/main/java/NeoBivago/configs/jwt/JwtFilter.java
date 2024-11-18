@@ -1,8 +1,7 @@
-package NeoBivago.configs;
+package NeoBivago.configs.jwt;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,11 +19,14 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired 
-    JwtService jwtS;
+    private final JwtService jwtS;
 
-    @Autowired
-    UserDetailsService userDetailsS;
+    private final UserDetailsService userDetailsS;
+
+    public JwtFilter(JwtService jwtS, UserDetailsService userDetailsS) {
+        this.jwtS = jwtS;
+        this.userDetailsS = userDetailsS;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
